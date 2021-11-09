@@ -1,6 +1,6 @@
 --- 
-title: "YOUR TITLE HERE"
-author: "YOUR NAMES HERE"
+title: "Mental Health in Athletes"
+author: "Katharina Fijan & Erin 'Josie' Donnelly"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 ---
