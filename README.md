@@ -1,64 +1,32 @@
-This is a template for the EDAV final project. It is based on the template created with *File, New Project..., New Directory, Book Project using bookdown* in RStudio. 
+This is the repository for our Exploratory Data Analysis and Visualizations Final Project. 
 
+We were interested in how different segments of sport types (performative, competitive; team, individual; elite, amateur, etc.) correlated with mental health outcomes. In searching for datasets that had relevant information and data points, we found this survey data of Northeastern students that targeted athletes and non-athletes from 2006. The data includes survey results from 795 students on “how or if participation in sports affects their health-risk behavior”. Based on the data collected, we altered our questions and scope accordingly, ultimately coming to the following questions:
 
-## ABSOLUTE ESSENTIALS
+1. How are identification with sports and mental health correlated?
 
-*If you have any difficulties or have feedback of any kind, please file an issue.*
+* How does this change with different standards of measuring identity as an athlete?
+  * Ex. identifying as jock vs. athlete, or by response to SSQ03: “Sports are an important part of my life”
+* How are perceived performance and mental health correlated?
+  * Ex. responses to survey questions like “I am the best”
+* How are perceived ambition and mental health correlated?
+  * Ex. responses to survey questions like “I do my very best”
+* How do certain sports appear to be correlated with self-destructive/dangerous behaviors?
+  * Ex. driving while drunk/high, engaging in physical fights
 
-### Copy this template
+2. How are individual/community connection to sports and mental health correlated?
 
-- [ ] 1. Click the green "Use this template" button above.  DO NOT FORK THE REPO. Choose a descriptive name for your repo, such as "federalbudget" or "AIDSdeaths".  (If you change your mind before you do any work, delete your new repo and start over.)
+* How does the correlation differ between sports that are typically performed individually (ex. golf, skiing), in small groups (ex. tennis), or in larger teams (ex. soccer)?
+* How are responses to survey questions like “Friends are involved in sports” and “Depressed if I couldn’t compete in sports” correlated?
 
-- [ ] 2. In the Description field, write: "Bookdown source files for EDAV final project".
+3. How are demographic information and mental health correlated for the student athletes?
 
-### Set up GitHub Pages	
-- [ ] 1. On the home page of your repo, click Settings. Scroll down to the GitHub pages section and change **Source** from **None** to **main**, change **/ (root)** to **/docs** folder, and click Save. Above the **Source** line, a bar will appear with your book's URL. The bar will initially be blue and indicate that your book is *ready* to be published and will change to green once it is published. Copy the URL. (Note that sometimes there is a delay until your book actually appears at that URL. If it doesn't appear after a few minutes, make a change and commit it to trigger a GitHub Pages build.)	
+* How does the correlation change in high school vs. college athletes? What about community athletes?
+* How do mental health responses differ between male and female athletes? Between sports that are traditionally male- or female-dominated?
 
-- [ ] 2. Click the gear button near "About" on the home page of the repo and paste your book URL into the **Website** field that appears on the right.
-
-### Clone the repo
-
-- [ ] 1. Clone your new repo with *File, New Project..., Version Control, Git* in RStudio.
-
-### Edit some key files
-
-- [ ] 1. In `index.Rmd`, change YOUR TITLE HERE to your title.
-
-- [ ] 2. In `index.Rmd`, change YOUR NAMES HERE to your names.
-
-- [ ] 3. In `_bookdown.yml`, change YOUR GITHUB USERNAME to your GitHub username in the two places it appears.
-
-- [ ] 4. In `_bookdown.yml`, change YOUR GITHUB REPO to your GitHub repo name in the two places it appears.
-
-(Note that 3. and 4. provide links to the `.Rmd` files of your project for editing and viewing. If you move your `.Rmd` files you will need to update these file paths. Once your book is rendered, test that the edit (pen) and view (eye) buttons work.)
-
-- [ ] 5. In `_output.yml`, change YOUR SHORT TITLE to a shortened version of your title. (Leave the "after:" line indicating that the book was published with bookdown as is.)
-
-### Render the book
-
-- [ ] 1. Install **bookdown** with `install.packages("bookdown")`. If you already have it, update to the most recent version.
-
-- [ ] 2. Render locally with `bookdown::render_book("index.Rmd")` or clicking the *Build book* button which should appear in the Build tab (in the same pane as Environment, History, Connections, ...).
-
-- [ ] 3. Use `browseURL("docs/index.html")` to view your book locally (or just open `index.html` in a browser).
-
-- [ ] 4. If it looks good, commit and push all changed files to GitHub. 
-
-(You will need to repeat steps 2 and 4 every time you wish to update the book online.)
-
-### Edit README	
-
-Once you've completed these steps, delete the content of this **README** and add a short description of your project with a link to the book URL. It would be appreciated if you add the following to the end:	
+----
 
 *This repo was initially generated from a bookdown template available here: https://github.com/jtr13/EDAVtemplate.*	
 
-### Demo Video	
-
-A demo video showing how to create a **bookdown book** following these similar instructions: http://bit.ly/fiveminutebookdown Note that this video uses a different template.
-
-### Additional features	
-
-Please consult the official guide to **bookdown**: https://bookdown.org/yihui/bookdown
 
 
 
