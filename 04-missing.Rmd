@@ -1,1 +1,158 @@
 # Missing values
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+```{r, echo=FALSE} 
+library(tidyverse)
+library(patchwork)
+library(magrittr)
+``` 
+
+## Load Dataset
+```{r}
+load("~/Documents/MSDS/EDAV/Final Project Data/DS0001/33661-0001-Data.rda")
+df <- da33661.0001
+```
+
+## Evaluating Missing Values
+
+### Defining a Function to Plot Missing Value Patterns: miss_pat()
+
+miss_pat takes in two values, (1) data: the dataframe of interest and (2) style: specifying 'count' or 'percent' as the style of graph you are interested in displaying. 
+
+```{r}
+miss_pat <- function(data, style) {
+  missing_patterns_tidy <- data.frame(is.na(data)) %>%
+    group_by_all() %>%
+    count(name = "count", sort = TRUE) %>%
+    ungroup() %>%
+    rownames_to_column("pattern id") %>%
+    pivot_longer(cols = !c(`pattern id`, count), names_to = "feature", values_to = "value") %>%
+    group_by(feature) %>%
+    mutate(freq = sum(count * ifelse(value == TRUE, 1, 0))) %>%
+    ungroup()
+  
+  missing_patterns_tidy_complete <- missing_patterns_tidy %>%
+    group_by(`pattern id`) %>%
+    mutate(num = sum(ifelse(value == TRUE, 1, 0))) %>%
+    group_by(`pattern id`) %>%
+    mutate(missing = ifelse(sum(num) == 0, "complete", "missing")) %>%
+    mutate(value = ifelse(missing == "complete", "complete", as.character(value))) %>%
+    mutate(complete = ifelse(missing == "complete" & feature == feature[1], "complete cases", NA))
+  
+  # setup data frame for top bar chart, missing per variable/feature
+  missing_patterns_tidy_1 <- missing_patterns_tidy %>%
+    select(feature, freq) %>%
+    unique()
+  
+  missing_patterns_tidy_1 <- missing_patterns_tidy_1 %>%
+    mutate(percent = sum(missing_patterns_tidy_1$freq)) %>%
+    mutate(percent = 100 * (freq/percent))
+
+    
+  # create data frame for side bar chart with only pattern id and count information, excluding repeat rows; compute count percentages
+  missing_patterns_tidy_2 <- missing_patterns_tidy_complete %>%
+    select(`pattern id`, count, missing) %>%
+    unique()
+    
+  missing_patterns_tidy_2 <- missing_patterns_tidy_2 %>%
+    mutate(percent = sum(missing_patterns_tidy_2$count)) %>%
+    mutate(percent = 100 * (count/percent))
+  
+  
+  # conditional next steps based on count or percent
+  # if user wants counts to be plotted
+  if (style == 'count') {
+    # set y variable and and scale according to frequency choice
+    option_1 = missing_patterns_tidy_1$freq
+    upper_y_1 = max(option_1)
+    label_y_1 = "Number of\nMissing Rows"
+    
+    option_2 = missing_patterns_tidy_2$count
+    upper_y_2 = max(option_2)
+    label_y_2 = "Row Count"
+  }
+  
+  # if user wants percents to be plotted
+  if (style == 'percent') {
+    # set y variable and and scale according to percent choice
+    option_1 = missing_patterns_tidy_1$percent
+    upper_y_1 = sum(option_1)
+    label_y_1 = "Percentage of\nMissing Rows"
+    
+    option_2 = missing_patterns_tidy_2$percent
+    upper_y_2 = 100
+    label_y_2 = "Percentage\nof Rows"
+  }
+  
+  
+  # create center pattern plot
+  plot_center <- ggplot(missing_patterns_tidy_complete, aes(x = fct_reorder(as.factor(feature), -freq), y = fct_rev(as.factor(as.numeric(`pattern id`))),
+                                                      fill = value, alpha = 0.7)) +
+  geom_tile(color = "white", alpha = .7, show.legend = FALSE) +
+  geom_text(aes(label = complete, x = 4), show.legend = FALSE) +
+  scale_fill_manual(values = c("darkgray", "lightgray", "mediumpurple1")) +
+  xlab("Variable") + 
+  ylab("Missing Pattern") +
+  theme_classic(8)
+
+  
+  # top bar chart: frequency or percentage of missing row by car feature
+  plot_top <- ggplot(missing_patterns_tidy_1, aes(x = fct_reorder(as.factor(feature), -option_1), y = option_1)) +
+    geom_col(fill = "royalblue1", alpha = 0.6) +
+    ylim(0,upper_y_1) +
+    ggtitle("Missing Value Patterns") +
+    xlab("") +
+    ylab(label_y_1) +
+    theme_classic(8)
+  
+  # side bar chart: frequency or percentage of missing row by pattern id
+  plot_side <- ggplot(missing_patterns_tidy_2, aes(x = fct_rev(as.factor(as.numeric(`pattern id`))), 
+                                                   y = option_2, fill = missing, alpha = .9)) +
+    geom_col(show.legend = FALSE) +
+    scale_fill_manual(values = c("blue", "royalblue1")) +
+    coord_flip() +
+    ylim(0,upper_y_2) +
+    xlab("") +
+    ylab(label_y_2) +
+    theme_classic(8)
+  
+  #combine using patchwork
+  (plot_top + plot_spacer() + plot_layout(widths = c(1.6,.75))) /
+  (plot_center + plot_side + plot_layout(widths = c(2,.75))) +
+  plot_layout(heights = c(.75, 2))
+    
+}
+
+```
+
+### Visualizing Missing Patterns
+
+Since our dataset it quite large (795, 590), we split up our visualizations per 100 columns, so patterns are still interpretable. However, the downside to this approach is that we lose sight of overarching patterns of missing data across all cases, what it does show is amongst a 100 column sample, which columns or attributes are most commonly missing. 
+
+```{r}
+#abbreviate column names for graphing purposes
+names(df) <- abbreviate(names(df))
+
+miss_pat((df)[500:580], 'percent')
+miss_pat((df)[400:500], 'percent')
+miss_pat((df)[300:400], 'percent')
+miss_pat((df)[200:300], 'percent')
+miss_pat((df)[100:200], 'percent')
+miss_pat((df)[0:100], 'percent')
+
+```
+
+### Observations 
+
+* 
+
+
+
+
+
+
+
+
