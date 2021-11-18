@@ -21,6 +21,11 @@ We were interested in how different segments of sport types (performative, compe
 * How does the correlation change in high school vs. college athletes? What about community athletes?
 * How do mental health responses differ between male and female athletes? Between sports that are traditionally male- or female-dominated?
 
+---
+Data and supplemental information about the study comes from:
+
+**Miller, Kathleen. Athletic Involvement Study (of Students in a Northeastern University in the United States), 2006. Ann Arbor, MI: Inter-university Consortium for Political and Social Research [distributor], 2013-04-30. https://doi.org/10.3886/ICPSR33661.v1**
+
 ----
 
 *This repo was initially generated from a bookdown template available here: https://github.com/jtr13/EDAVtemplate.*	
