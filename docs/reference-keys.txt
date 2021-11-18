@@ -2,11 +2,12 @@ introduction
 data-sources
 data-transformation
 missing-values
-load-dataset
-evaluating-missing-values
 defining-a-function-to-plot-missing-value-patterns-miss_pat
 visualizing-missing-patterns
 observations
+a-deeper-look-into-the-missing-data
+observations-1
+discussion
 results
 interactive-component
 conclusion

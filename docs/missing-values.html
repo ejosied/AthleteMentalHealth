@@ -24,7 +24,7 @@
 <meta name="author" content="Katharina Fijan &amp; Erin ‘Josie’ Donnelly" />
 
 
-<meta name="date" content="2021-11-16" />
+<meta name="date" content="2021-11-17" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -78,12 +78,14 @@
 <li class="chapter" data-level="3" data-path="data-transformation.html"><a href="data-transformation.html"><i class="fa fa-check"></i><b>3</b> Data transformation</a></li>
 <li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="missing-values.html"><a href="missing-values.html#load-dataset"><i class="fa fa-check"></i><b>4.1</b> Load Dataset</a></li>
-<li class="chapter" data-level="4.2" data-path="missing-values.html"><a href="missing-values.html#evaluating-missing-values"><i class="fa fa-check"></i><b>4.2</b> Evaluating Missing Values</a>
+<li class="chapter" data-level="4.1" data-path="missing-values.html"><a href="missing-values.html#defining-a-function-to-plot-missing-value-patterns-miss_pat"><i class="fa fa-check"></i><b>4.1</b> Defining a Function to Plot Missing Value Patterns: miss_pat()</a></li>
+<li class="chapter" data-level="4.2" data-path="missing-values.html"><a href="missing-values.html#visualizing-missing-patterns"><i class="fa fa-check"></i><b>4.2</b> Visualizing Missing Patterns</a>
 <ul>
-<li class="chapter" data-level="4.2.1" data-path="missing-values.html"><a href="missing-values.html#defining-a-function-to-plot-missing-value-patterns-miss_pat"><i class="fa fa-check"></i><b>4.2.1</b> Defining a Function to Plot Missing Value Patterns: miss_pat()</a></li>
-<li class="chapter" data-level="4.2.2" data-path="missing-values.html"><a href="missing-values.html#visualizing-missing-patterns"><i class="fa fa-check"></i><b>4.2.2</b> Visualizing Missing Patterns</a></li>
-<li class="chapter" data-level="4.2.3" data-path="missing-values.html"><a href="missing-values.html#observations"><i class="fa fa-check"></i><b>4.2.3</b> Observations</a></li>
+<li class="chapter" data-level="4.2.1" data-path="missing-values.html"><a href="missing-values.html#observations"><i class="fa fa-check"></i><b>4.2.1</b> Observations</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="missing-values.html"><a href="missing-values.html#a-deeper-look-into-the-missing-data"><i class="fa fa-check"></i><b>4.3</b> A Deeper Look into the Missing Data</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="missing-values.html"><a href="missing-values.html#observations-1"><i class="fa fa-check"></i><b>4.3.1</b> Observations:</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a></li>
@@ -110,26 +112,62 @@
             <section class="normal" id="section-">
 <div id="missing-values" class="section level1" number="4">
 <h1><span class="header-section-number">Chapter 4</span> Missing values</h1>
-<div id="load-dataset" class="section level2" number="4.1">
-<h2><span class="header-section-number">4.1</span> Load Dataset</h2>
+<div id="defining-a-function-to-plot-missing-value-patterns-miss_pat" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Defining a Function to Plot Missing Value Patterns: miss_pat()</h2>
+<p><code>miss_pat</code> takes in two values,</p>
+<ol style="list-style-type: decimal">
+<li><p><code>data</code>: the dataframe of interest and</p></li>
+<li><p><code>style</code>: specifying ‘count’ or ‘percent’ as the style of graph you are interested in displaying.</p></li>
+</ol>
 </div>
-<div id="evaluating-missing-values" class="section level2" number="4.2">
-<h2><span class="header-section-number">4.2</span> Evaluating Missing Values</h2>
-<div id="defining-a-function-to-plot-missing-value-patterns-miss_pat" class="section level3" number="4.2.1">
-<h3><span class="header-section-number">4.2.1</span> Defining a Function to Plot Missing Value Patterns: miss_pat()</h3>
-<p>miss_pat takes in two values, (1) data: the dataframe of interest and (2) style: specifying ‘count’ or ‘percent’ as the style of graph you are interested in displaying.</p>
-</div>
-<div id="visualizing-missing-patterns" class="section level3" number="4.2.2">
-<h3><span class="header-section-number">4.2.2</span> Visualizing Missing Patterns</h3>
-<p>Since our dataset it quite large (795, 590), we split up our visualizations per 100 columns, so patterns are still interpretable. However, the downside to this approach is that we lose sight of overarching patterns of missing data across all cases, what it does show is amongst a 100 column sample, which columns or attributes are most commonly missing.</p>
-<p><img src="finalproj_files/figure-html/unnamed-chunk-9-1.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-9-2.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-9-3.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-9-4.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-9-5.png" width="672" /><img src="finalproj_files/figure-html/unnamed-chunk-9-6.png" width="672" /></p>
-</div>
-<div id="observations" class="section level3" number="4.2.3">
-<h3><span class="header-section-number">4.2.3</span> Observations</h3>
+<div id="visualizing-missing-patterns" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Visualizing Missing Patterns</h2>
+<p>Since our dataset it quite large we only included missing patterns that had a count of at least 5.</p>
+<p><img src="finalproj_files/figure-html/fig12-1.png" width="672" /><img src="finalproj_files/figure-html/fig12-2.png" width="672" /></p>
+<div id="observations" class="section level3" number="4.2.1">
+<h3><span class="header-section-number">4.2.1</span> Observations</h3>
 <ul>
-<li></li>
+<li><p>The most common pattern is of complete cases, which is a great sign for our analysis! About 65% of rows contain no missing variables.</p></li>
+<li><p>For patterns 2, 4, 5 &amp; 7 - the pattern is fairly similar across and spans seemingly similar sets of variables.</p></li>
+<li><p>Patterns 3 &amp; 6 are also similar in the types of missing data.</p></li>
+</ul>
+</div>
+</div>
+<div id="a-deeper-look-into-the-missing-data" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> A Deeper Look into the Missing Data</h2>
+<p><img src="finalproj_files/figure-html/fig3-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>To take a deeper look into the data that is missing, we took a look directly at the ‘missing’ areas that were shown above. For the purposes of analysis we also flipped the chart in order to better read the column headers that constitute these missing data patterns. Note that the chart now increases in frequency of ‘missing’ from left to right on the x-axis per pattern.</p>
+<div id="observations-1" class="section level3" number="4.3.1">
+<h3><span class="header-section-number">4.3.1</span> Observations:</h3>
+<ul>
+<li><p>Based on inspection, we can see that the common questions of the questionnaire that have missing values are those in the following categories:</p>
+<ul>
+<li><p>MPSQ: Reasons for Participation in Sport</p></li>
+<li><p>CESD: Mental Health Assessment Section</p></li>
+<li><p>SRI: Sexual Activity Questions</p></li>
+</ul></li>
+<li><p>The two variables that are missing across 4 patterns each are:</p>
+<ol style="list-style-type: decimal">
+<li><p>SRI02 - LAST TIME HAD SEX: USED OTHER BIRTH CONTROL</p></li>
+<li><p>PSME - RECEIVED MEDIA ATTENTION</p></li>
+</ol></li>
+<li><p>For patterns 3 and 6 the common areas of missing variables are from:</p>
+<ul>
+<li><p>CESD: the Mental Health Assessment section</p></li>
+<li><p>SRI: the Sexual Activity Section</p></li>
+</ul></li>
+<li><p>The variable missing most often is TEOSQ13.</p></li>
+</ul>
+<div id="discussion" class="section level4" number="4.3.1.1">
+<h4><span class="header-section-number">4.3.1.1</span> Discussion</h4>
+<ul>
+<li><p>It is understandable that some college students would prefer not to disclose their sexual behavior, so this pattern of missing values seems non-random.</p></li>
+<li><p>Mental health likewise is topic that is often glossed over, and given the survey was conducted in 2006 mental health was an even less discussed topic than it is today, it is not surprising that some of these questions were left unanswered by students.</p></li>
+<li><p>The MSPQ variables are part of the following question: “People have many different reasons for participating in sports. Below are listed some of those possible reasons. How important is each of these reasons for you?” and each variable accounts for a different answer to the question which the student could answer on a score from 1 to 5. A missing variable indicates that they did not answer the question at all. This could be because they do not participate in sports.</p></li>
+<li><p>Variable TEOSQ13 is a question within the “Feelings about Athletic Success” section where the question was: “People have different ideas about what athletic”success" means, other than simply winning or losing a competition. Think about the times when you have felt most successful in sport. How well does each of the following statements describe your feelings? I feel most successful in sport when . . . I do my very best." There were 13 variations on this question that provided different answers to select from in the questionnaire and all 13 of the TEOSQ variables show up in the missing values top list. Similar to the MSPQ variables, the responses to the question was a score between 1 to 5. We believe that missing values to this question are also due to students who did not participate in sports.</p></li>
 </ul>
 
+</div>
 </div>
 </div>
 </div>
