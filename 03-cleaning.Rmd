@@ -1,1 +1,3 @@
 # Data transformation
+
+Our data is already in a form that is workable in R. The given data frame will be modified as needed to answer each of our questions.
