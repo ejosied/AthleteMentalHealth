@@ -139,7 +139,7 @@ miss_pat <- function(data, style) {
 
 ## Visualizing Missing Patterns
 
-Since our dataset it quite large we only included missing patterns that had a count of at least 5. 
+Since our dataset is quite large we only included missing patterns that had a count of at least 5. 
 
 ```{r fig12}
 miss_pat(df, 'count')
