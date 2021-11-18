@@ -1,2 +1,35 @@
 # Data sources
 
+##### Who is responsible for collecting the data? How is it collected?
+
+The data was collected as part of the study *Academic Involvement Study (of Students in a Northeastern University in the United States), 2006*. It was conducted by Kathleen Miller of the University of Buffalo. The study falls under ICPSR (Inter-University Consortium of Political and Social Research).
+
+Information was gathered on April 21st, 2006 in the form of a one-time (cross-sectional) questionnaire distributed and filled out on site using pen and paper. Participants were confirmed to be at least 18 years of age, and submitting a signed informed consent form with their survey responses.
+
+Participants were asked to be honest and accurate, and were assured that their personal information would be kept confidential. Careful instructions were provided throughout the questionnaire, including when to skip non-applicable questions.
+
+
+##### Basic information about the dataset:
+
+The data includes responses to the questions presented in the questionnaire, which focus on "experiences, observations, and attitudes about athletic involvement as well as a variety of health-risk behaviors". Som demographic information is also included, such as age, gender, ethnicity, and religion.
+
+*Section 1: Demographic Background* contains 17 questions about basic personal, academic, and family information.
+
+*Section 2: Athletic and Physical Activities* contains three separate lists--—one for each of high school and community sport participation during high shcool, and one for college and/or community sport participation in the past 12 months---of 22 sports with two ``other" options and an option for no sports. There are also 6 questions about the frequency of sport participation.
+
+*Section 3: Health Risk Behaviors* contains 18 opportunities for responses about alcohol and drug use; 20 opportunities for responses about risk behaviors and sexual activity; 10 opportunities for responses about anxiety,  depression, and loneliness.
+
+*Section 4: Primary Sport History* contains 31 opportunities for responses about the student's primary sport involving participation, perception, and policies.
+
+*Section 5: Personal Feelings About Athletic Involvement* contains 25 questions to guage personal, physical and mental wellness, and social motivations for participating in sports. It also contains 22 questions about goals, perception of performance and motivation, and views on success.
+
+*Section 6: Exercise and Sport-Related Identity* contains 24 questions about personal relationship with sports and exercise. It also contained 54 questions about perceptions of ``jocks" vs. ``athletes".
+
+*Section 7: Attitudes* contains 21 questions about romance and sexual activity, 23 auestions about winning and losing, and 18 questions about risky behaviors.
+
+The result is a data set with 795 observations representing the student participants, and 590 variables representing responses. There are more variables than questions asked because some questions had opportunities for multiple responses.
+
+
+##### Issues/problems with the data:
+
+* THis will be updated as we work more with the data.
