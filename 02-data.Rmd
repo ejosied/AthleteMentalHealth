@@ -23,7 +23,7 @@ The data includes responses to the questions presented in the questionnaire, whi
 
 *Section 5: Personal Feelings About Athletic Involvement* contains 25 questions to guage personal, physical and mental wellness, and social motivations for participating in sports. It also contains 22 questions about goals, perception of performance and motivation, and views on success.
 
-*Section 6: Exercise and Sport-Related Identity* contains 24 questions about personal relationship with sports and exercise. It also contained 54 questions about perceptions of ``jocks" vs. ``athletes".
+*Section 6: Exercise and Sport-Related Identity* contains 24 questions about personal relationship with sports and exercise. It also contained 54 questions about perceptions of "jocks" vs. "athletes".
 
 *Section 7: Attitudes* contains 21 questions about romance and sexual activity, 23 auestions about winning and losing, and 18 questions about risky behaviors.
 
