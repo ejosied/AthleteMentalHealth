@@ -1,1 +1,139 @@
 # Results
+
+
+## How are identification with sports and mental health correlated?
+
+
+## How are individual/community connection to sports and mental health correlated?
+
+```{r, echo=FALSE} 
+library(tidyverse)
+library(magrittr)
+``` 
+
+```{r}
+#load dataset
+load("~/Documents/MSDS/EDAV/Final Project Data/DS0001/33661-0001-Data.rda")
+df <- da33661.0001
+
+#abbreviate column names for graphing purposes
+names(df) <- abbreviate(names(df))
+```
+
+```{r}
+#mental health variables
+MH_subset <- select(df, CASEID, CESD01, CESD02, CESD03, CESD04, CESD05, CESD06, CESD07, CESD08, CESD09, CESD10)
+
+#sport
+college_sport <- df %>% 
+  select("CASEID", starts_with("TS"))
+
+community_sport <- df %>%
+  select("CASEID", starts_with("TC"))
+
+#personal feelings about athletic involvement 
+Sxn_5 <- df %>% 
+  select("CASEID", (starts_with("MPSQ")), starts_with("SOQ"), starts_with("TEOSQ"), starts_with("SSQ") , starts_with("AIQ"), starts_with("GENWIN"))
+```
+
+```{r}
+#visualize college sports played 
+#tidy data for college sport data 
+tidy_college <- college_sport %>%
+  pivot_longer(!c("CASEID"), names_to = "Sport_Year", values_to = "participated" ) %>%
+  filter(participated == '(1) Marked') %>%
+  separate(Sport_Year, into = c('year', 'sport'), sep = 4) %>%
+  mutate(year = case_when(
+    year == 'TSFR' ~ 'Freshman',
+    year == 'TSSO' ~ 'Sophomore', 
+    year == 'TSJR' ~ 'Junior',
+    year == 'TSSE' ~ 'Senior'
+    )) %>%
+  mutate(sport = case_when(
+    sport == 'BX' ~ 'Boxing',
+    sport == 'BB' ~ 'Baseball', 
+    sport == 'BK' ~ 'Basketball',
+    sport == 'BL' ~ 'Bowling',
+    sport == 'CH' ~ 'Cheerleading',
+    sport == 'CC' ~ 'Cross_Country',
+    sport == 'DN' ~ 'Dance', 
+    sport == 'FH' ~ 'Field_Hockey',
+    sport == 'FB' ~ 'Football',
+    sport == 'GF' ~ 'Golf', 
+    sport == 'GM' ~ 'Gymnastics', 
+    sport == 'IH' ~ 'Ice_Hockey',
+    sport == 'LC' ~ 'Lacrosse', 
+    sport == 'RG' ~ 'Rugby', 
+    sport == 'SK' ~ 'Skiing',
+    sport == 'SC' ~ 'Soccer',
+    sport == 'SB' ~ 'Softball', 
+    sport == 'SW' ~ 'Swimming', #swimming and diving
+    sport == 'TN' ~ 'Tennis',
+    sport == 'TF' ~ 'Track', #track and field
+    sport == 'VB' ~ 'Volleyball',
+    sport == 'WR' ~ 'Wrestling', 
+    sport == 'O1' ~ 'Other', 
+    sport == 'O2' ~ 'Other', 
+    sport == 'NO' ~ 'No_Teams'
+  )) %>%
+  select(CASEID, year, sport)
+
+```
+
+```{r}
+#Sport Groupings: 
+#Individual Sport: Boxing, Bowling (?), Cross Country, Dance, Golf, Gymnastics, Skiing, Swimming & Diving, Tennis, Track and Field, Wrestling
+#Teams Sport: Baseball, Basketball, Cheerleading, Field Hockey, Football, Ice Hockey, Lacrosse, Rugby, Soccer, Softball, Volleyball
+
+individual_sport = c('Boxing', 'Bowling','Cross_Country', 'Dance', 'Golf', 'Gymnastics', 'Skiing', 'Swimming', 'Tennis', 'Track', 'Wrestling')
+
+#dataframe with team & indv groupings and removing other and no teams
+tidy_college_group <- tidy_college %>% 
+  subset(sport!='Other' & sport!='No_Teams') %>%
+  mutate(sport_group = ifelse(
+    sport %in% individual_sport, 'Individual', 'Team'))
+```
+
+```{r}
+sport_facet_year <- ggplot(tidy_college_group, aes(fct_rev(fct_infreq(sport)))) + 
+  geom_bar(fill = 'lightblue') + 
+  facet_wrap(~fct_inorder(year)) +
+  coord_flip() +
+  ggtitle("College Sports Played per Year") +
+  xlab("Sport") +
+  ylab("Count") +
+  theme_bw(10)
+
+sport_dist <- ggplot(tidy_college_group, aes(fct_rev(fct_infreq(sport)), fill = sport_group)) + 
+  geom_bar() + 
+  coord_flip() +
+  ggtitle("College Sports Played") +
+  xlab("Sport") +
+  ylab("Count") +
+  theme_bw(12)
+
+sport_dist
+sport_facet_year
+```
+
+##Observations
+
+* The most popular sports played by respondents are Track & Field, Basketball, and Soccer. 
+
+* The spread of responses is quite even across years in college, with no year with significantly less or more respondants than another. 
+
+
+```{r}
+#factor to numeric for MH_outcomes columns
+MH_subset[] <- lapply(MH_subset, as.numeric)
+
+##diverging stacked barchart to show MH ? 
+
+
+```
+
+
+
+
+
+

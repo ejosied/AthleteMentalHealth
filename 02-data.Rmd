@@ -1,6 +1,6 @@
 # Data sources
 
-##### Who is responsible for collecting the data? How is it collected?
+## Who is responsible for collecting the data? How is it collected?
 
 The data was collected as part of the study *Academic Involvement Study (of Students in a Northeastern University in the United States), 2006*. It was conducted by Kathleen Miller of the University of Buffalo. The study falls under ICPSR (Inter-University Consortium of Political and Social Research).
 
@@ -9,7 +9,7 @@ Information was gathered on April 21st, 2006 in the form of a one-time (cross-se
 Participants were asked to be honest and accurate, and were assured that their personal information would be kept confidential. Careful instructions were provided throughout the questionnaire, including when to skip non-applicable questions.
 
 
-##### Basic information about the dataset:
+## Basic information about the dataset:
 
 The data includes responses to the questions presented in the questionnaire, which focus on "experiences, observations, and attitudes about athletic involvement as well as a variety of health-risk behaviors". Som demographic information is also included, such as age, gender, ethnicity, and religion.
 
@@ -30,6 +30,6 @@ The data includes responses to the questions presented in the questionnaire, whi
 The result is a data set with 795 observations representing the student participants, and 590 variables representing responses. There are more variables than questions asked because some questions had opportunities for multiple responses.
 
 
-##### Issues/problems with the data:
+## Issues/problems with the data:
 
 * This will be updated as we work more with the data.

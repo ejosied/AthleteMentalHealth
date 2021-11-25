@@ -1,0 +1,389 @@
+--- 
+title: "Mental Health in Athletes"
+author: "Katharina Fijan & Erin 'Josie' Donnelly"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+---
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+# Introduction
+
+We were interested in analyzing the correlation between different sports and mental health outcomes. Our curiosity began with inquiries of how mental health varies within different catagories of sports: performative vs. competitive, team vs. individual, elite vs. amateur. correlated with mental health outcomes. It became our task to find data that spanned a variety of sports and offered several insights into mental health across a somewhat consistent population.
+
+In searching for datasets that had relevant information and data points, we found this 2006 survey data of 795 Northeastern students that targeted athletes and non-athletes. The data includes survey results on “how or if participation in sports affects their health-risk behavior”. Based on the data collected, we altered our questions and scope accordingly, and ultimately decided to fovcus on answering the following questions:
+
+##### How are identification with sports and mental health correlated?
+
+How does this change with different standards of measuring identity as an athlete?
+Example: How do students identifying as jock vs. athlete, or by response to the question “Sports are an important part of my life”?
+
+How are perceived performance and mental health correlated?
+Example: How do mental health results correspond to the different responses to survey questions like “I am the best”?
+
+How are perceived ambition and mental health correlated?
+Example: How do mental health results correspond to the different responses to survey questions like “I do my very best”?
+
+How do certain sports appear to be correlated with self-destructive/dangerous behaviors?
+Example: Is there a correlation between type of athelete and reports of behaviors like driving while drunk or high, or engaging in physical fights?
+
+##### How are individual/community connection to sports and mental health correlated?
+
+How does the correlation differ between sports that are typically performed individually (example: golf, skiing), in small groups (example: tennis), or in larger teams (example: soccer)?
+
+How are responses to social survey questions like “Friends are involved in sports” and mental health survey questions like “Depressed if I couldn’t compete in sports” correlated?
+
+##### How are demographic information and mental health correlated for the student athletes?
+
+How does the correlation change in high school vs. college athletes? What about community athletes?
+
+How do mental health responses differ between male and female athletes? What about between sports that are traditionally male- or female-dominated? 
+
+<!--chapter:end:index.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+# Data sources
+
+## Who is responsible for collecting the data? How is it collected?
+
+The data was collected as part of the study *Academic Involvement Study (of Students in a Northeastern University in the United States), 2006*. It was conducted by Kathleen Miller of the University of Buffalo. The study falls under ICPSR (Inter-University Consortium of Political and Social Research).
+
+Information was gathered on April 21st, 2006 in the form of a one-time (cross-sectional) questionnaire distributed and filled out on site using pen and paper. Participants were confirmed to be at least 18 years of age, and submitting a signed informed consent form with their survey responses.
+
+Participants were asked to be honest and accurate, and were assured that their personal information would be kept confidential. Careful instructions were provided throughout the questionnaire, including when to skip non-applicable questions.
+
+
+## Basic information about the dataset:
+
+The data includes responses to the questions presented in the questionnaire, which focus on "experiences, observations, and attitudes about athletic involvement as well as a variety of health-risk behaviors". Som demographic information is also included, such as age, gender, ethnicity, and religion.
+
+*Section 1: Demographic Background* contains 17 questions about basic personal, academic, and family information.
+
+*Section 2: Athletic and Physical Activities* contains three separate lists--—one for each of high school and community sport participation during high shcool, and one for college and/or community sport participation in the past 12 months---of 22 sports with two ``other" options and an option for no sports. There are also 6 questions about the frequency of sport participation.
+
+*Section 3: Health Risk Behaviors* contains 18 opportunities for responses about alcohol and drug use; 20 opportunities for responses about risk behaviors and sexual activity; 10 opportunities for responses about anxiety,  depression, and loneliness.
+
+*Section 4: Primary Sport History* contains 31 opportunities for responses about the student's primary sport involving participation, perception, and policies.
+
+*Section 5: Personal Feelings About Athletic Involvement* contains 25 questions to guage personal, physical and mental wellness, and social motivations for participating in sports. It also contains 22 questions about goals, perception of performance and motivation, and views on success.
+
+*Section 6: Exercise and Sport-Related Identity* contains 24 questions about personal relationship with sports and exercise. It also contained 54 questions about perceptions of "jocks" vs. "athletes".
+
+*Section 7: Attitudes* contains 21 questions about romance and sexual activity, 23 auestions about winning and losing, and 18 questions about risky behaviors.
+
+The result is a data set with 795 observations representing the student participants, and 590 variables representing responses. There are more variables than questions asked because some questions had opportunities for multiple responses.
+
+
+##### Issues/problems with the data:
+
+* This will be updated as we work more with the data.
+
+<!--chapter:end:02-data.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+# Data transformation
+
+Our data is already in a form that is workable in R. The given data frame will be modified as needed to answer each of our questions.
+
+<!--chapter:end:03-cleaning.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+# Missing values
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+```{r, echo=FALSE} 
+library(tidyverse)
+library(patchwork)
+library(magrittr)
+``` 
+
+```{r}
+#load dataset
+load("~/Documents/MSDS/EDAV/Final Project Data/DS0001/33661-0001-Data.rda")
+df <- da33661.0001
+
+#abbreviate column names for graphing purposes
+names(df) <- abbreviate(names(df))
+```
+
+## Defining a Function to Plot Missing Value Patterns: miss_pat()
+
+`miss_pat` takes in two values, 
+
+(1) `data`: the dataframe of interest and 
+
+(2) `style`: specifying 'count' or 'percent' as the style of graph you are interested in displaying. 
+
+```{r, function}
+miss_pat <- function(data, style) {
+  missing_patterns_tidy <- data.frame(is.na(data)) %>%
+    group_by_all() %>%
+    count(name = "count", sort = TRUE) %>%
+    ungroup() %>%
+    rownames_to_column("pattern id") %>%
+    pivot_longer(cols = !c(`pattern id`, count), names_to = "feature", values_to = "value") %>%
+    group_by(feature) %>%
+    mutate(freq = sum(count * ifelse(value == TRUE, 1, 0))) %>%
+    ungroup() 
+
+  # only keep values where count of pattern is at least 5 for visualization purposes
+  missing_patterns_tidy <- missing_patterns_tidy[missing_patterns_tidy$count > 5, ]
+  
+  missing_patterns_tidy_complete <- missing_patterns_tidy %>%
+    group_by(`pattern id`) %>%
+    mutate(num = sum(ifelse(value == TRUE, 1, 0))) %>%
+    group_by(`pattern id`) %>%
+    mutate(missing = ifelse(sum(num) == 0, "complete", "missing")) %>%
+    mutate(value = ifelse(missing == "complete", "complete", as.character(value))) %>%
+    mutate(complete = ifelse(missing == "complete" & feature == feature[1], "complete cases", NA))
+  
+  # setup data frame for top bar chart, missing per variable/feature
+  missing_patterns_tidy_1 <- missing_patterns_tidy %>%
+    select(feature, freq) %>%
+    unique()
+  
+  missing_patterns_tidy_1 <- missing_patterns_tidy_1 %>%
+    mutate(percent = sum(missing_patterns_tidy_1$freq)) %>%
+    mutate(percent = 100 * (freq/percent))
+
+    
+  # create data frame for side bar chart with only pattern id and count information, excluding repeat rows; compute count percentages
+  missing_patterns_tidy_2 <- missing_patterns_tidy_complete %>%
+    select(`pattern id`, count, missing) %>%
+    unique()
+    
+  missing_patterns_tidy_2 <- missing_patterns_tidy_2 %>%
+    mutate(percent = sum(missing_patterns_tidy_2$count)) %>%
+    mutate(percent = 100 * (count/percent))
+  
+  
+  # conditional next steps based on count or percent
+  # if user wants counts to be plotted
+  if (style == 'count') {
+    # set y variable and and scale according to frequency choice
+    option_1 = missing_patterns_tidy_1$freq
+    upper_y_1 = max(option_1)
+    label_y_1 = "Number of\nMissing Rows"
+    
+    option_2 = missing_patterns_tidy_2$count
+    upper_y_2 = max(option_2)
+    label_y_2 = "Row Count"
+  }
+  
+  # if user wants percents to be plotted
+  if (style == 'percent') {
+    # set y variable and and scale according to percent choice
+    option_1 = missing_patterns_tidy_1$percent
+    upper_y_1 = 100
+    label_y_1 = "Percentage of\nMissing Rows"
+    
+    option_2 = missing_patterns_tidy_2$percent
+    upper_y_2 = 100
+    label_y_2 = "Percentage\nof Rows"
+  }
+  
+  
+  # create center pattern plot
+  plot_center <- ggplot(missing_patterns_tidy_complete, aes(x = fct_reorder(as.factor(feature), -freq), 
+                                                            y = fct_rev(as.factor(as.numeric(`pattern id`))),
+                                                      fill = value, alpha = 0.7)) +
+  geom_tile(color = "white", alpha = .7, show.legend = FALSE) +
+  geom_text(aes(label = complete, x = 4), show.legend = FALSE) +
+  scale_fill_manual(values = c("darkgray", "lightgray", "mediumpurple1")) +
+  xlab("Variable") + 
+  ylab("Missing Pattern") +
+  theme_classic(8)
+
+  
+  # top bar chart: frequency or percentage of missing row by car feature
+  plot_top <- ggplot(missing_patterns_tidy_1, aes(x = fct_reorder(as.factor(feature), -option_1), y = option_1)) +
+    geom_col(fill = "royalblue1", alpha = 0.6) +
+    ylim(0,upper_y_1) +
+    ggtitle("Missing Value Patterns") +
+    xlab("") +
+    ylab(label_y_1) +
+    theme_classic(8)
+  
+  # side bar chart: frequency or percentage of missing row by pattern id
+  plot_side <- ggplot(missing_patterns_tidy_2, aes(x = fct_rev(as.factor(as.numeric(`pattern id`))), 
+                                                   y = option_2, fill = missing, alpha = .9)) +
+    geom_col(show.legend = FALSE) +
+    scale_fill_manual(values = c("blue", "royalblue1")) +
+    coord_flip() +
+    ylim(0,upper_y_2) +
+    xlab("") +
+    ylab(label_y_2) +
+    theme_classic(8)
+  
+  #combine using patchwork
+  (plot_top + plot_spacer() + plot_layout(widths = c(1.6,.75))) /
+  (plot_center + plot_side + plot_layout(widths = c(2,.75))) +
+  plot_layout(heights = c(.75, 2))
+    
+}
+
+```
+
+## Visualizing Missing Patterns
+
+Since our dataset is quite large we only included missing patterns that had a count of at least 5. 
+
+```{r fig12}
+miss_pat(df, 'count')
+miss_pat(df, 'percent')
+```
+
+### Observations 
+
+* The most common pattern is of complete cases, which is a great sign for our analysis! About 65% of rows contain no missing variables. 
+
+* For patterns 2, 4, 5 & 7 - the pattern is fairly similar across and spans seemingly similar sets of variables. 
+
+* Patterns 3 & 6 are also similar in the types of missing data. 
+
+## A Deeper Look into the Missing Data 
+
+```{r fig3, fig.height = 8, fig.width = 6, fig.align = "center"}
+
+missing_patterns_tidy <- data.frame(is.na(df)) %>%
+  group_by_all() %>%
+  count(name = "count", sort = TRUE) %>%
+  ungroup() %>%
+  rownames_to_column("pattern id") %>%
+  pivot_longer(cols = !c(`pattern id`, count), names_to = "feature", values_to = "value") %>%
+  group_by(feature) %>%
+  mutate(freq = sum(count * ifelse(value == TRUE, 1, 0))) %>%
+  ungroup() 
+
+# only keep values where count of pattern is at least 5 for visualization purposes
+missing_patterns_tidy <- missing_patterns_tidy[missing_patterns_tidy$count > 5, ]
+  
+missing_patterns_tidy_complete <- missing_patterns_tidy %>%
+  group_by(`pattern id`) %>%
+  mutate(num = sum(ifelse(value == TRUE, 1, 0))) %>%
+  group_by(`pattern id`) %>%
+  mutate(missing = ifelse(sum(num) == 0, "complete", "missing")) %>%
+  mutate(value = ifelse(missing == "complete", "complete", as.character(value))) %>%
+  mutate(complete = ifelse(missing == "complete" & feature == feature[1], "complete cases", NA))
+
+ggplot((missing_patterns_tidy_complete[missing_patterns_tidy_complete$freq > 25,] ), aes(x = fct_reorder(as.factor(feature), -freq), 
+                                                            y = (as.factor(as.numeric(`pattern id`))),
+                                                      fill = value, alpha = 0.7)) +
+  geom_tile(color = "white", alpha = .7, show.legend = FALSE) +
+  geom_text(aes(label = complete, x = 4), show.legend = FALSE) +
+  scale_fill_manual(values = c("darkgray", "lightgray", "mediumpurple1")) +
+  coord_flip() +
+  xlab("Variable") + 
+  ylab("Missing Pattern") +
+  ggtitle("Zoom in to Missing Patterns (Flipped)") +
+  theme_classic(10)
+
+```
+
+To take a deeper look into the data that is missing, we took a look directly at the 'missing' areas that were shown above. For the purposes of analysis we also flipped the chart in order to better read the column headers that constitute these missing data patterns. Note that the chart now increases in frequency of 'missing' from left to right on the x-axis per pattern. 
+
+### Observations: 
+
+* Based on inspection, we can see that the common questions of the questionnaire that have missing values are those in the following categories: 
+  * MPSQ: Reasons for Participation in Sport
+  
+  * CESD: Mental Health Assessment Section
+  
+  * SRI: Sexual Activity Questions
+
+* The two variables that are missing across 4 patterns each are: 
+
+  (1) SRI02 - LAST TIME HAD SEX: USED OTHER BIRTH CONTROL
+
+  (2) PSME - RECEIVED MEDIA ATTENTION 
+
+* For patterns 3 and 6 the common areas of missing variables are from:
+
+  * CESD: the Mental Health Assessment section 
+  
+  * SRI: the Sexual Activity Section 
+
+* The variable missing most often is TEOSQ13. 
+
+#### Discussion 
+
+* It is understandable that some college students would prefer not to disclose their sexual behavior, so this pattern of missing values seems non-random. 
+
+* Mental health likewise is topic that is often glossed over, and given the survey was conducted in 2006 mental health was an even less discussed topic than it is today, it is not surprising that some of these questions were left unanswered by students. 
+
+* The MSPQ variables are part of the following question: "People have many different reasons for participating in sports. Below are listed some of those possible reasons. How important is each of these reasons for you?" and each variable accounts for a different answer to the question which the student could answer on a score from 1 to 5. A missing variable indicates that they did not answer the question at all. This could be because they do not participate in sports. 
+
+* Variable TEOSQ13 is a question within the "Feelings about Athletic Success" section where the question was: "People have different ideas about what athletic "success" means, other than simply winning or losing a competition. Think about the times when you have felt most successful in sport. How well does each of the following statements describe your feelings? I feel most successful in sport when . . . I do my very best." There were 13 variations on this question that provided different answers to select from in the questionnaire and all 13 of the TEOSQ variables show up in the missing values top list. Similar to the MSPQ variables, the responses to the question was a score between 1 to 5. We believe that missing values to this question are also due to students who did not participate in sports. 
+
+
+
+
+<!--chapter:end:04-missing.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+# Results
+
+## How are identification with sports and mental health correlated?
+
+
+## How are individual/community connection to sports and mental health correlated?
+
+<!--chapter:end:05-results.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+# Interactive component
+
+
+
+<!--chapter:end:06-interactive.Rmd-->
+
+```{r include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+# Conclusion
+
+
+<!--chapter:end:07-conclusion.Rmd-->
+
