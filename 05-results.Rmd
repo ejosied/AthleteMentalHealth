@@ -22,7 +22,7 @@ names(df) <- abbreviate(names(df))
 
 ```{r}
 #mental health variables
-MH_subset <- select(df, CASEID, CESD01, CESD02, CESD03, CESD04, CESD05, CESD06, CESD07, CESD08, CESD09, CESD10)
+MH_subset <- dplyr::select(df, CESD01, CESD02, CESD03, CESD04, CESD05, CESD06, CESD07, CESD08, CESD09, CESD10)
 
 #sport
 college_sport <- df %>% 
@@ -116,19 +116,44 @@ sport_dist
 sport_facet_year
 ```
 
-##Observations
+## Observations
 
 * The most popular sports played by respondents are Track & Field, Basketball, and Soccer. 
 
 * The spread of responses is quite even across years in college, with no year with significantly less or more respondants than another. 
 
+## Mental Health Data Exploration
+
+* The questions related to mental health were asked in the following manner: "Below is a list of some of the ways you may have felt or behaved recently. Please indicate how often you have felt this way during the past week."
+
 
 ```{r}
-#factor to numeric for MH_outcomes columns
-MH_subset[] <- lapply(MH_subset, as.numeric)
+#factor to numeric for MH_outcomes columns, likert takes factor data, so comment out! 
+MH_subset_numeric <- MH_subset 
+MH_subset_numeric[] <- lapply(MH_subset, as.numeric) 
 
-##diverging stacked barchart to show MH ? 
 
+#rename columns with question for plotting
+MH_subset <- MH_subset  %>% 
+  rename("Bothered by things that usually don't bother me" = CESD01,
+        "Trouble keeping mind on what I was doing" = CESD02,
+        "Depressed" = CESD03,
+        "Everything was an effort" = CESD04,
+        "Hopeful about future" = CESD05,
+        "Fearful" = CESD06,
+        "Sleep was restless" = CESD07, 
+        "Happy" = CESD08,
+        "Lonely" = CESD09,
+        "Could not get going" = CESD10)
+
+##diverging stacked barchart to show MH 
+library(likert)
+library(RColorBrewer)
+
+MH_summary <- likert(MH_subset)
+
+# use function likert() to plot survey data
+plot(likert(MH_subset), main = "Mental Health Responses")
 
 ```
 
