@@ -22,7 +22,7 @@ names(df) <- abbreviate(names(df))
 
 ```{r}
 #mental health variables
-MH_subset <- dplyr::select(df, CESD01, CESD02, CESD03, CESD04, CESD05, CESD06, CESD07, CESD08, CESD09, CESD10)
+MH_subset <- dplyr::select(df, CASEID, CESD01, CESD02, CESD03, CESD04, CESD05, CESD06, CESD07, CESD08, CESD09, CESD10)
 
 #sport
 college_sport <- df %>% 
@@ -90,8 +90,7 @@ individual_sport = c('Boxing', 'Bowling','Cross_Country', 'Dance', 'Golf', 'Gymn
 #dataframe with team & indv groupings and removing other and no teams
 tidy_college_group <- tidy_college %>% 
   subset(sport!='Other' & sport!='No_Teams') %>%
-  mutate(sport_group = ifelse(
-    sport %in% individual_sport, 'Individual', 'Team'))
+  mutate(sport_group = ifelse(sport %in% individual_sport, 'Individual', 'Team'))
 ```
 
 ```{r}
@@ -150,13 +149,41 @@ MH_subset <- MH_subset  %>%
 library(likert)
 library(RColorBrewer)
 
-MH_summary <- likert(MH_subset)
+MH_summary <- likert(MH_subset[,c(2:11)])
 
 # use function likert() to plot survey data
-plot(likert(MH_subset), main = "Mental Health Responses")
+plot(MH_summary, main = "Mental Health Responses", col =) 
 
 ```
 
+```{r}
+#check correlation between depressed CESD03 and sport team 
+#merge df's on caseid 
+
+depressed_sport <- left_join(MH_subset_numeric[,c(1, 4)], tidy_college_group) %>%
+  group_by(CASEID) %>%
+  rename("Depressed" = CESD03) %>%
+  drop_na() 
+  
+depressed <- ggplot(depressed_sport, aes(x=Depressed)) +
+  geom_bar() +
+  facet_wrap(~sport_group) 
+
+happy_sport <- left_join(MH_subset_numeric[, c(1,9)], tidy_college_group) %>%
+  rename("Happy" = CESD08) %>%
+  group_by(CASEID) %>%
+  drop_na()
+
+happy <- ggplot(happy_sport, aes(x=Happy)) +
+  geom_bar() +
+  facet_wrap(~sport_group) 
+
+grid.arrange(depressed, happy, ncol=2)
+
+## ^ plot needs to be better but first view at happy vs. depressed results for college athletes 
+## plots are also counting duplicate counts per student. Want to keep levels per sport but for these plots we don't need 
+## each row to count for one, each caseID should count as one....
+```
 
 
 
