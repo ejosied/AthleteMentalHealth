@@ -1,6 +1,6 @@
 # Investigating Athlete Mental Health Among College Athletes 
 
-Katharina Fijan & Erin "Josie" Donnelly 
+Katharina Fijan & Erin "Josie" Donnelly -- December 2021
 
 We were interested in how different segments of sport types (performative, competitive; team, individual; elite, amateur, etc.) correlated with mental health outcomes. In searching for datasets that had relevant information and data points, we found a survey data of Northeastern students targeting athletes and non-athletes from 2006. The data includes survey results from 795 students on “how or if participation in sports affects their health-risk behavior”. Based on the data collected, we ask the following questions:
 
