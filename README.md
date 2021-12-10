@@ -1,4 +1,4 @@
-# Investigating Athlete Mental Health Among College Athletes 
+# Investigating Mental Health Among College Athletes 
 
 Katharina Fijan & Erin "Josie" Donnelly -- December 2021
 
