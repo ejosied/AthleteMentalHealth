@@ -1,67 +1,339 @@
 # Results
 
-
-## How are identification with sports and mental health correlated?
-
-
-## How are individual/community connection to sports and mental health correlated?
-
 ```{r, echo=FALSE} 
 library(tidyverse)
 library(magrittr)
+library(dplyr)
+library(vcd)
+library(RColorBrewer)
+library(ggplot2)
+library(gridExtra)
 ``` 
 
 ```{r}
 #load dataset
 load("~/Documents/MSDS/EDAV/Final Project Data/DS0001/33661-0001-Data.rda")
 df <- da33661.0001
-
-#abbreviate column names for graphing purposes
-names(df) <- abbreviate(names(df))
 ```
 
 ```{r}
-#mental health variables
-MH_subset <- dplyr::select(df, CASEID, CESD01, CESD02, CESD03, CESD04, CESD05, CESD06, CESD07, CESD08, CESD09, CESD10)
-
-#sport
-college_sport <- df %>% 
-  select("CASEID", starts_with("TS"))
-
-community_sport <- df %>%
-  select("CASEID", starts_with("TC"))
-
-#personal feelings about athletic involvement 
-Sxn_5 <- df %>% 
-  select("CASEID", (starts_with("MPSQ")), starts_with("SOQ"), starts_with("TEOSQ"), starts_with("SSQ") , starts_with("AIQ"), starts_with("GENWIN"))
+# define function to indicate whether or not a student has indicated that they have done a sport
+is_marked <- function(x) x == "(1) Marked"
 ```
 
 ```{r}
-#visualize college sports played 
-#tidy data for college sport data 
-tidy_college <- college_sport %>%
-  pivot_longer(!c("CASEID"), names_to = "Sport_Year", values_to = "participated" ) %>%
-  filter(participated == '(1) Marked') %>%
-  separate(Sport_Year, into = c('year', 'sport'), sep = 4) %>%
-  mutate(year = case_when(
-    year == 'TSFR' ~ 'Freshman',
-    year == 'TSSO' ~ 'Sophomore', 
-    year == 'TSJR' ~ 'Junior',
-    year == 'TSSE' ~ 'Senior'
-    )) %>%
-  mutate(sport = case_when(
+get_indicators <- function(s){
+  
+  sports <- c("Boxing", "Baseball", "Basketball", "Bowling", "Cheerleading", "Cross Country", "Dance", "Field Hockey", "Football", "Golf", "Gymnastics", "Ice Hockey", "Lacross", "Rugby", "Skiing", "Soccer", "Swimming", "Tennis", "Track", "Volleyball", "Wrestling")
+  sport_codes <- c("BX", "BB", "BK", "BL", "CH", "CC", "DN", "FH", "FB", "GF", "GM", "IH", "LC", "RG", "SK", "SC", "SB", "SW", "TN", "TF", "VB", "WR")
+  
+  index <- match(s, sports)
+  sport_code <- sport_codes[index]
+  
+  prefixes <- c("TSFR", "TSSO", "TSJR", "TSSE", "TCFR", "TCSO", "TCJR", "TCSE", "TPCL", "TPCM")
+  indic <- c()
+  for(p in prefixes){
+    indic <- c(indic, paste(p, sport_code, sep=""))
+  }
+  
+  return(indic)
+}
+```
+
+```{r}
+df_recoded <- function(data, v) {
+  
+  positive_mh <- c("CESD05", "CESD08")
+  negative_mh <- c("CESD01", "CESD02", "CESD03", "CESD04", "CESD06", "CESD07", "CESD09", "CESD10")
+  
+  motivation_int <- c("MPSQ01", "MPSQ02", "MPSQ03", "MPSQ06", "MPSQ09", "MPSQ11", "MPSQ14", "MPSQ17", "MPSQ20", "MPSQ21", "MPSQ22", "MPSQ23", "MPSQ25")
+  motivation_ext <- c("MPSQ04", "MPSQ05", "MPSQ07", "MPSQ08", "MPSQ10", "MPSQ12", "MPSQ13", "MPSQ15", "MPSQ16", "MPSQ18", "MPSQ19", "MPSQ24")
+  
+  success_hardwork <- c("TEOSQ02", "TEOSQ05", "TEOSQ07", "TEOSQ08", "TEOSQ10", "TEOSQ13")
+  success_ego <- c("TEOSQ01", "TEOSQ03", "TEOSQ04", "TEOSQ06", "TEOSQ09", "TEOSQ11", "TEOSQ12")
+  
+  behavior_cautious <- c("GENRIS02", "GENRIS03", "GENRIS07", "GENRIS09", "GENRIS10", "GENRIS12", "GENRIS13", "GENRIS14", "GENRIS17", "GENRIS18")
+  behavior_risky <- c("GENRIS01", "GENRIS04", "GENRIS05", "GENRIS06", "GENRIS08", "GENRIS11", "GENRIS15", "GENRIS16")
+  
+  if(startsWith(v, "CESD")){
+    if(v %in% positive_mh){
+      data <- data %>%
+        mutate_at(c(v), funs(fct_recode(.,`-2` = "(1) Rarely or none of the time (less than 1 day)", `-1` = "(2) Some or a little of the time (1-2 days)", `1` = "(3) Occasionally or a moderate amount of time (3-4 days)", `2` = "(4) All of the time (5-7 days)")))
+    }
+    else if(v %in% negative_mh){
+      data <- data %>%
+        mutate_at(c(v), funs(fct_recode(.,`2` = "(1) Rarely or none of the time (less than 1 day)", `1` = "(2) Some or a little of the time (1-2 days)", `-1` = "(3) Occasionally or a moderate amount of time (3-4 days)", `-2` = "(4) All of the time (5-7 days)")))
+    }
+  }
+  
+  else if(startsWith(v, "MPSQ")){
+    if(v %in% motivation_int){
+      data <- data %>%
+        mutate_at(c(v), funs(fct_recode(., `-2` = "(1) Not Important at All", `-1` = "(2) Not Very Important", `0` = "(3) Somewhat Important", `1` = "(4) Pretty Important", `2` = "(5) Extremely Important")))
+    }
+    else if(v %in% motivation_ext){
+      data <- data %>%
+        mutate_at(c(v), funs(fct_recode(., `2` = "(1) Not Important at All", `1` = "(2) Not Very Important", `0` = "(3) Somewhat Important", `-1` = "(4) Pretty Important", `-2` = "(5) Extremely Important")))
+    }
+  }
+  
+  else if(startsWith(v, "TEOSQ")){
+    if(v %in% success_hardwork){
+      data <- data %>%
+        mutate_at(c(v), funs(fct_recode(., `-2` = "(1) Doesn't Describe Me At All", `-1` = "(2) Describes Me a Little", `0` = "(3) Describes Me Somewhat", `1` = "(4) Describes Me Pretty Well", `2` = "(5) Describes Me Extremely Well")))
+    }
+    else if(v %in% success_ego){
+      data <- data %>%
+        mutate_at(c(v), funs(fct_recode(., `2` = "(1) Doesn't Describe Me At All", `1` = "(2) Describes Me a Little", `0` = "(3) Describes Me Somewhat", `-1` = "(4) Describes Me Pretty Well", `-2` = "(5) Describes Me Extremely Well")))
+    }
+  }
+  
+  else if(startsWith(v, "GENRI")){
+    if(v %in% behavior_cautious){
+      data <- data %>%
+        mutate_at(c(v), funs(fct_recode(., `-2` = "(1) Strongly Disagree", `-1` = "(2) Disagree", `1` = "(3) Agree", `2` = "(4) Strongly Agree")))
+    }
+    else if(v %in% behavior_risky){
+      data <- data %>%
+        mutate_at(c(v), funs(fct_recode(., `2` = "(1) Strongly Disagree", `1` = "(2) Disagree", `-1` = "(3) Agree", `-2` = "(4) Strongly Agree")))
+    }
+  }
+
+  
+  # if(v %in% negative_mh || v %in% motivation_ext || v %in% success_ego){
+  #   data <- data %>%
+  #     mutate_at(c(v), funs(as.factor(-1 * as.numeric(.))))
+  # }
+  
+  
+  else if(startsWith(v, "PSPORT")){
+    data <- data %>%
+      mutate_at(c(v), funs(fct_recode(.,
+          `Badminton` = "(01) Badminton",                          
+          `Baseball` = "(02) Baseball",
+          `Basketball` = "(03) Basketball",
+          `Bowling` = "(04) Bowling",
+          `Boxing` = "(05) Boxing / Martial arts",
+          `Cheerleading` = "(06) Cheer / Spirit",
+          `Cross Country` = "(07) Cross country",
+          `Dance` = "(08) Dance team",
+          `Equestrian` = "(09) Equestrian",
+          `Field Hockey` = "(11) Field hockey",
+          `Figure Skating` = "(12) Figure skating",
+          `Football` = "(13) Football",
+          `Golf` = "(14) Golf",
+          `Gymnastics` = "(15) Gymnastics",
+          `Ice Hockey` = "(16) Ice hockey / Roller hockey",
+          `Lacrosse` = "(17) Lacrosse",
+          `Rugby` = "(18) Rugby",
+          `Skiing` = "(19) Skiing",
+          `Soccer` = "(20) Soccer",
+          `Softball` = "(21) Softball",
+          `Swimming` = "(22) Swimming / Diving",
+          `Tennis` = "(23) Tennis / Racquetball",
+          `Track` = "(24) Track and field",
+          `Volleyball` = "(25) Volleyball",
+          `Wrestling` = "(26) Wrestling",
+          `Snowboarding` = "(27) Snowboarding",
+          `Weightlifting` = "(28) Weightlifting",
+          `Handball` = "(29) Handball",
+          `Rowing` = "(30) Rowing / Crew",
+          `Cricket` = "(31) Cricket",
+          `Ping Pong` = "(32) Ping pong",
+          `Colorguard` = "(33) Color / Winterguard",
+          `Other` = "(66) Other sport"
+      )))
+  }
+  
+  else{
+    data <- data
+  }
+  
+  return(data)
+}
+```
+
+
+```{r}
+vars_by_sport <- function(data_frame, sport, var1, var2) {
+  
+  indicators <- get_indicators(sport)
+  
+  q1_df <- data_frame %>%
+    filter(if_any(indicators, is_marked)) %>%
+    dplyr::select("CASEID", all_of(var1), all_of(var2)) %>%
+    filter(complete.cases(.))
+  
+  q1_df <- df_recoded(q1_df, var1)
+  q1_df <- df_recoded(q1_df, var2)
+  
+  return(q1_df)
+  
+}
+```
+
+
+```{r}
+# obtain different "scores" to measure different areas of health and wellness
+
+# modify data frame
+df_sports <- mutate(df, sport = "")
+df_sports <- df_recoded(df_sports, "PSPORT")
+
+# sports <- as.character(df_sports$PSPORT)
+sports <- c("Boxing", "Baseball", "Basketball", "Bowling", "Cheerleading", "Cross Country", "Dance", "Field Hockey", "Football", "Golf", "Gymnastics", "Ice Hockey", "Lacrosse", "Rugby", "Skiing", "Soccer", "Swimming", "Tennis", "Track", "Volleyball", "Wrestling")
+
+# for(s in sports){
+#   df_sports <- df_sports %>%
+#     rowwise() %>%
+#     mutate(sport = case_when(
+#         (if_any(get_indicators(s), is_marked) || as.character(PSPORT) == s) && sport == "" ~ s,
+#         (if_any(get_indicators(s), is_marked) || as.character(PSPORT) == s) && !(sport == "") ~ paste(sport, s, sep=", "),
+#         !if_any(get_indicators(s), is_marked) && !(as.character(PSPORT) == s) ~ sport
+#       ))
+# }
+
+```
+
+
+```{r}
+# scoring:
+  # Extreme positive response: +2
+  # Moderate positive response: +1
+  # Neutral/No response: +0
+  # Moderate negative response: -1
+  # Extreme negative response: -2
+
+for(v in names(df_sports)){
+  if(!(startsWith(v, "PSPORT"))){
+      df_sports <- df_recoded(df_sports, v)
+  }
+}
+
+for(v in names(df_sports)){
+  if(startsWith(v, "CESD") || startsWith(v, "MPSQ") || startsWith(v, "TEOSQ") || startsWith(v, "GENRI")){
+    df_sports[,v] <- as.numeric(as.character(df_sports[,v]))
+  }
+}
+
+# compute mental health "score" for each student
+df_sports <- df_sports %>%
+  mutate(`Mental Health Score` = rowSums(dplyr::select(., starts_with("CESD")), na.rm = TRUE)) %>%
+  mutate(`Motivation Score` = rowSums(dplyr::select(., starts_with("MPSQ")), na.rm = TRUE)) %>%
+  mutate(`Success Score` = rowSums(dplyr::select(., starts_with("TEOSQ")), na.rm = TRUE)) %>%
+  mutate(`Risk Behavior Score` = rowSums(dplyr::select(., starts_with("GENRI")), na.rm = TRUE))
+
+#add sport_type to df_sports
+individual_sport <- c('Boxing', 'Bowling','Cross_Country', 'Dance', 'Golf', 'Gymnastics', 'Skiing', 'Swimming', 'Tennis', 'Track', 'Wrestling')
+
+df_sports <- df_sports %>% 
+  mutate(sport_group = ifelse(df_sports$PSPORT %in% individual_sport, 'Individual', 'Team'))
+
+
+```
+
+
+## Who took this survey?
+
+```{r}
+##Demographics breakdown
+
+df$RACE <- recode_factor(df$RACE, 
+                         `White` = "(4) White or Caucasian",
+                         `Asian American` = "(2) Asian American or Pacific Islander",
+                         `Black/ African American` = "(3) Black or African American",
+                         `American Indian / Other` = "(6) American Indian / Native American / Other",
+                         `Mixed` = "(5) Mixed Race")
+
+s1<- ggplot(df, aes(AGE)) +
+  geom_bar() +
+  xlab("Age") +
+  ylab("")
+
+s2<- ggplot(df, aes(fct_recode(SEX, 
+                                  `Male` = "(0) Male" , 
+                                  `Female` = "(1) Female"))) +
+  geom_bar() +
+  xlab("Gender") +
+  ylab("")
+
+s3<- ggplot(df, aes(fct_recode(RACE, 
+                              White = "(4) White or Caucasian",
+                              `Asian American` = "(2) Asian American or Pacific Islander",
+                              `Black or African American` = "(3) Black or African American",
+                              `American Indian / Other` = "(6) American Indian / Native American / Other",
+                              `Mixed Race` = "(5) Mixed race" ))) +
+  geom_bar() +
+  xlab("Race") +
+  ylab("") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+
+s4<- ggplot(df, aes(fct_recode(COLYEAR,
+                               `Freshman` = "(1) Freshman",
+                               `Sophomore` = "(2) Sophomore", 
+                               `Junior` = "(3) Junior", 
+                               `Senior` = "(4) Senior",
+                               `Other` = "(5) Other"))) + 
+  geom_bar() +
+  xlab("Year in College") +
+  ylab("") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+grid.arrange(s1, s2, s3, s4, ncol=2, top = textGrob("Demographic Information"))
+
+
+```
+
+Students who took part in this survey are within the age range of College Students as is expected. Some older students who participated in the study may include graduate students and some students who started college later than their peers or are taking extra time to finish. The breakdown between men and women is fairly evenly split, which is nice to see. The majority of respondents were white, which may lead to some biases in responses, particularly because mental health is known to have strong correlations with economic status and race. However, when you consider this is a survey given to students at Northeastern University, a private university in Boston, in 2006 it could be feasible that this breakdown represented the student population at that time, especially for athletes and those interested in sports. Lastly, we see from the demographics that we have a majority of underclassmen who took the survey (Freshman, Sophomore) which may also lead to biased results as the stresses of college, adult life, and a persons relationship to sport likely change between Freshman and Senior years of college. 
+
+Now that we know a little bit about the demographics of respondents, lets take a look at what sports they participated in:
+
+```{r}
+#Athlete Breakdown Introduction
+#primary sports of all respondents
+
+df_sports %>% 
+  drop_na(PSPORT) %>% 
+  ggplot(aes(x=fct_rev(fct_infreq(PSPORT)))) +
+  geom_bar(fill = "cadetblue4", color = "black") +
+  coord_flip() +
+  ggtitle("Primary Sport Indicated by Students") +
+  ylab("Count") +
+  xlab("Sport")
+
+s5<- ggplot(df_sports, aes(x=fct_infreq(PSPORT))) +
+  geom_bar(fill = "cadetblue4", color = "black") +
+  coord_flip() +
+  ggtitle("Primary Sport Indicated by Students") +
+  ylab("Count") +
+  xlab("Sport")
+  #theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+
+#college sport played in the past year
+df_recentcolsport <- df %>%
+  dplyr::select("CASEID", starts_with("TP")) %>% 
+  pivot_longer(!c("CASEID"), names_to = "Sport", values_to = "Participated" ) %>%
+  filter(Participated == '(1) Marked') %>%
+  separate(Sport, into = c('Level', 'sport'), sep = 4) %>%
+  mutate(Level = 
+           ifelse(Level == 'TPCL', 'College', 'Community')) %>%
+  mutate(sport = 
+           case_when(
     sport == 'BX' ~ 'Boxing',
     sport == 'BB' ~ 'Baseball', 
     sport == 'BK' ~ 'Basketball',
     sport == 'BL' ~ 'Bowling',
     sport == 'CH' ~ 'Cheerleading',
-    sport == 'CC' ~ 'Cross_Country',
+    sport == 'CC' ~ 'Cross Country',
     sport == 'DN' ~ 'Dance', 
-    sport == 'FH' ~ 'Field_Hockey',
+    sport == 'FH' ~ 'Field Hockey',
     sport == 'FB' ~ 'Football',
     sport == 'GF' ~ 'Golf', 
     sport == 'GM' ~ 'Gymnastics', 
-    sport == 'IH' ~ 'Ice_Hockey',
+    sport == 'IH' ~ 'Ice Hockey',
     sport == 'LC' ~ 'Lacrosse', 
     sport == 'RG' ~ 'Rugby', 
     sport == 'SK' ~ 'Skiing',
@@ -76,116 +348,309 @@ tidy_college <- college_sport %>%
     sport == 'O2' ~ 'Other', 
     sport == 'NO' ~ 'No_Teams'
   )) %>%
-  select(CASEID, year, sport)
+  filter(sport != 'No_Teams')
 
-```
-
-```{r}
-#Sport Groupings: 
-#Individual Sport: Boxing, Bowling (?), Cross Country, Dance, Golf, Gymnastics, Skiing, Swimming & Diving, Tennis, Track and Field, Wrestling
-#Teams Sport: Baseball, Basketball, Cheerleading, Field Hockey, Football, Ice Hockey, Lacrosse, Rugby, Soccer, Softball, Volleyball
-
-individual_sport = c('Boxing', 'Bowling','Cross_Country', 'Dance', 'Golf', 'Gymnastics', 'Skiing', 'Swimming', 'Tennis', 'Track', 'Wrestling')
-
-#dataframe with team & indv groupings and removing other and no teams
-tidy_college_group <- tidy_college %>% 
-  subset(sport!='Other' & sport!='No_Teams') %>%
-  mutate(sport_group = ifelse(sport %in% individual_sport, 'Individual', 'Team'))
-```
-
-```{r}
-sport_facet_year <- ggplot(tidy_college_group, aes(fct_rev(fct_infreq(sport)))) + 
-  geom_bar(fill = 'lightblue') + 
-  facet_wrap(~fct_inorder(year)) +
+s6<- ggplot(df_recentcolsport) +
+  geom_bar(mapping = aes(x=fct_infreq(sport), fill = Level)) +
   coord_flip() +
-  ggtitle("College Sports Played per Year") +
+  scale_fill_manual(values = c("cadetblue3", "cadetblue4")) + 
+  ggtitle("Types of sports students participated in within the past year \n at the college or community level") +
   xlab("Sport") +
-  ylab("Count") +
-  theme_bw(10)
+  ylab("Count")
 
-sport_dist <- ggplot(tidy_college_group, aes(fct_rev(fct_infreq(sport)), fill = sport_group)) + 
-  geom_bar() + 
-  coord_flip() +
-  ggtitle("College Sports Played") +
-  xlab("Sport") +
-  ylab("Count") +
-  theme_bw(12)
+#s5
+#s6
 
-sport_dist
-sport_facet_year
 ```
 
-## Observations
+Students selected a wide variety of sports as their Primary Sport. Each student was only able to elect one sport, however we are not displaying those who did not select any sport as we will only be looking at students with a primary sport. We see that the most popular sports are Basketball, Soccer, Football and Baseball. ....
 
-* The most popular sports played by respondents are Track & Field, Basketball, and Soccer. 
 
-* The spread of responses is quite even across years in college, with no year with significantly less or more respondants than another. 
-
-## Mental Health Data Exploration
-
-* The questions related to mental health were asked in the following manner: "Below is a list of some of the ways you may have felt or behaved recently. Please indicate how often you have felt this way during the past week."
-
+## Investigating Mental Health Responses 
 
 ```{r}
-#factor to numeric for MH_outcomes columns, likert takes factor data, so comment out! 
-MH_subset_numeric <- MH_subset 
-MH_subset_numeric[] <- lapply(MH_subset, as.numeric) 
+#subset to MH response data
+library(HH)
 
+individual_sport <- c('Boxing', 'Bowling','Cross_Country', 'Dance', 'Golf', 'Gymnastics', 'Skiing', 'Swimming', 'Tennis', 'Track', 'Wrestling')
 
-#rename columns with question for plotting
-MH_subset <- MH_subset  %>% 
-  rename("Bothered by things that usually don't bother me" = CESD01,
-        "Trouble keeping mind on what I was doing" = CESD02,
+MH_responses <- df %>%
+  dplyr::select("CASEID", starts_with("CESD"), "PSPORT") %>%
+  mutate(PSPORT = fct_recode(PSPORT,
+          `Badminton` = "(01) Badminton",                          
+          `Baseball` = "(02) Baseball",
+          `Basketball` = "(03) Basketball",
+          `Bowling` = "(04) Bowling",
+          `Boxing` = "(05) Boxing / Martial arts",
+          `Cheerleading` = "(06) Cheer / Spirit",
+          `Cross Country` = "(07) Cross country",
+          `Dance` = "(08) Dance team",
+          `Equestrian` = "(09) Equestrian",
+          `Field Hockey` = "(11) Field hockey",
+          `Figure Skating` = "(12) Figure skating",
+          `Football` = "(13) Football",
+          `Golf` = "(14) Golf",
+          `Gymnastics` = "(15) Gymnastics",
+          `Ice Hockey` = "(16) Ice hockey / Roller hockey",
+          `Lacrosse` = "(17) Lacrosse",
+          `Rugby` = "(18) Rugby",
+          `Skiing` = "(19) Skiing",
+          `Soccer` = "(20) Soccer",
+          `Softball` = "(21) Softball",
+          `Swimming` = "(22) Swimming / Diving",
+          `Tennis` = "(23) Tennis / Racquetball",
+          `Track` = "(24) Track and field",
+          `Volleyball` = "(25) Volleyball",
+          `Wrestling` = "(26) Wrestling",
+          `Snowboarding` = "(27) Snowboarding",
+          `Weightlifting` = "(28) Weightlifting",
+          `Handball` = "(29) Handball",
+          `Rowing` = "(30) Rowing / Crew",
+          `Cricket` = "(31) Cricket",
+          `Ping Pong` = "(32) Ping pong",
+          `Colorguard` = "(33) Color / Winterguard",
+          `Other` = "(66) Other sport")) %>%
+  mutate(sport_group = 
+           ifelse(df$PSPORT %in% individual_sport, 'Individual', 'Team')) %>%
+  rename("Bothered by things that \n usually don't bother me" = CESD01,
+        "Trouble keeping mind on \n what I was doing" = CESD02,
         "Depressed" = CESD03,
         "Everything was an effort" = CESD04,
         "Hopeful about future" = CESD05,
         "Fearful" = CESD06,
-        "Sleep was restless" = CESD07, 
+        "Sleep was restless" = CESD07,
         "Happy" = CESD08,
         "Lonely" = CESD09,
-        "Could not get going" = CESD10)
+        "Could not get going" = CESD10) %>%
+  drop_na() 
 
-##diverging stacked barchart to show MH 
-library(likert)
-library(RColorBrewer)
+MH_pivot <- MH_responses[,c(1:11)] %>% 
+  pivot_longer(!CASEID, names_to="Questions", values_to="Answer") %>%
+  group_by(Questions, Answer) %>%
+  summarize(Count=n()) %>%
+  mutate(Answer = fct_recode(Answer, 
+              `1-Rarely or none \n of the time` = "(1) Rarely or none of the time (less than 1 day)",
+              `2-Some or a little \n of the time` = "(2) Some or a little of the time (1-2 days)",
+              `3-Occasionally or \n moderate amount \n of time` = "(3) Occasionally or a moderate amount of time (3-4 days)", 
+              `4 All of \n the time` = "(4) All of the time (5-7 days)"))
 
-MH_summary <- likert(MH_subset[,c(2:11)])
-
-# use function likert() to plot survey data
-plot(MH_summary, main = "Mental Health Responses", col =) 
+ggplot(MH_pivot) +
+  geom_bar(aes(x = reorder(Questions, Count), y=-Count, fill=Answer), color="black", position="stack", stat="identity") +
+  coord_flip() + 
+  ggtitle("Survey Responses to MH Questions") +
+  ylab("") +
+  xlab("Questions") +
+  scale_fill_brewer(palette="Blues") +
+  theme_classic() +
+  theme(legend.position= "bottom", legend.justification = "left", axis.text.x=element_blank(), axis.ticks.x=element_blank())
 
 ```
+
+Add discussion of graph here. Transition to self made scores to see if MH correlates with any other behaviors
+
+
+## Investigating Sport Motivation, Perspectives on Success, Behavior Patterns, and Mental Health for All Athletes 
+
+In effort to assess how factors related to sports and sport performance are related to an athletes mental health, we gave all respondents the following scores based on their responses to the survey questions:
+
+* Mental Health Score -- Mental Health questions were posed in the following manner: `"Below is a list of some of the ways you may have felt or behaved recently. Please indicate how often you have felt this way during the past week."` Based on the feeling, we assigned scores that were positive to indicate positive mental health outlook versus negative scores to indicate a negative outlook on mental health. For example, if a respondent answered "I was happy" with "All of the time" they would get +2 points, versus a response of "Rarely or None of the Time" would get -2 points. 
+
+* .... 
 
 ```{r}
-#check correlation between depressed CESD03 and sport team 
-#merge df's on caseid 
+#Primary Sport Analysis
 
-depressed_sport <- left_join(MH_subset_numeric[,c(1, 4)], tidy_college_group) %>%
-  group_by(CASEID) %>%
-  rename("Depressed" = CESD03) %>%
-  drop_na() 
-  
-depressed <- ggplot(depressed_sport, aes(x=Depressed)) +
-  geom_bar() +
-  facet_wrap(~sport_group) 
+df_scores <- df_sports %>%
+  dplyr::select("CASEID", "PSPORT", "Mental Health Score", "Motivation Score", "Success Score", "Risk Behavior Score", "sport_group") %>%
+  group_by(PSPORT) %>%
+  mutate(avg_mh = mean(`Mental Health Score`)) %>%
+  group_by(PSPORT) %>%
+  mutate(avg_motiv = mean(`Motivation Score`)) %>%
+  group_by(PSPORT) %>%
+  mutate(avg_success = mean(`Success Score`)) %>%
+  group_by(PSPORT) %>%
+  mutate(avg_risk = mean(`Risk Behavior Score`)) %>%
+  distinct(CASEID, PSPORT, .keep_all = TRUE)
 
-happy_sport <- left_join(MH_subset_numeric[, c(1,9)], tidy_college_group) %>%
-  rename("Happy" = CESD08) %>%
-  group_by(CASEID) %>%
-  drop_na()
+df_mh_scores <- df_scores %>%
+  dplyr::select("PSPORT", avg_mh, sport_group) %>%
+  unique() %>%
+  filter(!is.na(PSPORT))
 
-happy <- ggplot(happy_sport, aes(x=Happy)) +
-  geom_bar() +
-  facet_wrap(~sport_group) 
+ggplot(df_mh_scores, aes(x = reorder(PSPORT, -avg_mh), y = avg_mh, fill = sport_group)) +
+  geom_col() +
+  geom_hline(yintercept = mean(df_mh_scores$avg_mh), col="tomato1") +
+  scale_fill_manual(values = c("darkseagreen2", "steelblue3")) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
-grid.arrange(depressed, happy, ncol=2)
+df_motiv_scores <- df_scores %>%
+  dplyr::select("PSPORT", avg_motiv, sport_group) %>%
+  unique() %>%
+  filter(!is.na(PSPORT))
 
-## ^ plot needs to be better but first view at happy vs. depressed results for college athletes 
-## plots are also counting duplicate counts per student. Want to keep levels per sport but for these plots we don't need 
-## each row to count for one, each caseID should count as one....
+ggplot(df_motiv_scores, aes(x = reorder(PSPORT, -avg_motiv), y = avg_motiv, fill = sport_group)) +
+  geom_col() +
+  geom_hline(yintercept = mean(df_motiv_scores$avg_motiv), col="tomato1") +
+  scale_fill_manual(values = c("darkseagreen2", "steelblue3")) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+df_success_scores <- df_scores %>%
+  dplyr::select("PSPORT", avg_success, sport_group) %>%
+  unique() %>%
+  filter(!is.na(PSPORT))
+
+ggplot(df_success_scores, aes(x = reorder(PSPORT, -avg_success), y = avg_success, fill = sport_group)) +
+  geom_col() +
+  geom_hline(yintercept = mean(df_success_scores$avg_success), col="tomato1") +
+  scale_fill_manual(values = c("darkseagreen2", "steelblue3")) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+df_risk_scores <- df_scores %>%
+  dplyr::select("PSPORT", avg_risk, sport_group) %>%
+  unique() %>%
+  filter(!is.na(PSPORT))
+
+ggplot(df_risk_scores, aes(x = reorder(PSPORT, -avg_risk), y = avg_risk, fill = sport_group)) +
+  geom_col() +
+  geom_hline(yintercept = mean(df_risk_scores$avg_risk), col="tomato1") +
+  scale_fill_manual(values = c("darkseagreen2", "steelblue3")) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
 ```
 
+Discuss how sports appear in various scoring, check correlation between scores.
 
 
+```{r}
+#try correlation plots for MH scores 
+library(ggcorrplot)
+library(corrplot)
+
+#calculate pairwaise correlation values for mh score columns and store as matrix 
+MH_corr <- df_scores[,c(8:11)] %>%
+  cor(., use = "pairwise.complete.obs")
+
+#option 1
+# M = cor(MH_corr)
+# corrplot(M, order = 'hclust', addrect = 2)
+
+#option 2
+g1 <- ggcorrplot(MH_corr,
+           hc.order = TRUE,
+           lab = TRUE)
+
+#check per sport type for differences? 
+MH_team_corr <- df_scores %>%
+  filter(sport_group == 'Team')
+
+MH_team_corr <- MH_team_corr[,c(8:11)] %>%
+  cor(., use = "pairwise.complete.obs")
+
+g2<- ggcorrplot(MH_team_corr,
+           hc.order = TRUE,
+           lab = TRUE)
+
+MH_ind_corr <- df_scores %>%
+  filter(sport_group == 'Individual')
+
+MH_ind_corr <- MH_ind_corr[,c(8:11)] %>%
+  cor(., use = "pairwise.complete.obs")
+
+g3 <- ggcorrplot(MH_ind_corr,
+                 hc.order = TRUE,
+                 lab = TRUE)
+
+g1 + ggtitle('Correlation for All Athletes')
+g2 + ggtitle('Correlation for Team Athletes')
+g3 + ggtitle('Correlation for Individual Athletes')
+```
+
+## Observations:
+
+* Mental Health Scores as we have defined them are not strongly correlated for Individual Athletes with feelings about athletic success scores, motivation for participating in sports scores, or propensity for risk scores (correlation scores are close to zero, denoting no correlation). At first, this seems surprising, however after some thought you will realize that Individual Athletes are quite varied because they are competing individually! There are some athletes who compete individually who are very self-centered and ego focused (low success score) while some may have a much more hardworking attitude about their sport where they view their success as 
+
+* However, for Team athletes, there is a moderate correlation between mental health and feelings about athletic success, as well as between mental health and motivation for participation in sports scores (~.5 correlation). This is interpreted as an increase in positive outlook (high MH score) being loosely positively correlated with feelings about athletic success due to hard work. In the other direction, a negative outlook on mental health is loosely correlated with athletic success coming from an ego-centric view. 
+
+....
+
+Transition to looking at Track and Dance only. 
+
+```{r}
+# data frames by sport for q1: mental health vs. thoughts on sports
+
+# depression frequency vs. importance of fun
+track <- vars_by_sport(df, "Track", "CESD03", "MPSQ17")
+vcd::mosaic(CESD03 ~ MPSQ17,
+     data = track, direction = c("v", "h"),
+     labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
+     highlighting_fill = brewer.pal(4, "Blues"),
+     main = "Track: CESD03 vs. MPSQ17")
+
+dance <- vars_by_sport(df, "Dance", "CESD03", "MPSQ17")
+vcd::mosaic(CESD03 ~ MPSQ17,
+     data = dance, direction = c("v", "h"),
+     labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
+     highlighting_fill = brewer.pal(4, "Blues"),
+     main = "Dance: CESD03 vs. MPSQ17")
 
 
+# depression frequency vs. not letting parents down
+track <- vars_by_sport(df, "Track", "CESD03", "MPSQ19")
+vcd::mosaic(CESD03 ~ MPSQ19,
+     data = track, direction = c("v", "h"),
+     labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
+     highlighting_fill = brewer.pal(4, "Blues"),
+     main = "Track: CESD03 vs. MPSQ19")
+
+dance <- vars_by_sport(df, "Dance", "CESD03", "MPSQ19")
+vcd::mosaic(CESD03 ~ MPSQ19,
+     data = dance, direction = c("v", "h"),
+     labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
+     highlighting_fill = brewer.pal(4, "Blues"),
+     main = "Dance: CESD03 vs. MPSQ19")
+
+
+# depression frequency vs. thinking of oneself as the best
+track <- vars_by_sport(df, "Track", "CESD03", "TEOSQ11")
+vcd::mosaic(CESD03 ~ TEOSQ11,
+     data = track, direction = c("v", "h"),
+     labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
+     highlighting_fill = brewer.pal(4, "Blues"),
+     main = "Track: CESD03 vs. TEOSQ11")
+
+dance <- vars_by_sport(df, "Dance", "CESD03", "TEOSQ11")
+vcd::mosaic(CESD03 ~ TEOSQ11,
+     data = dance, direction = c("v", "h"),
+     labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
+     highlighting_fill = brewer.pal(4, "Blues"),
+     main = "Dance: CESD03 vs. TEOSQ11")
+
+
+# depression frequency vs. doing one's best
+track <- vars_by_sport(df, "Track", "CESD03", "TEOSQ13")
+vcd::mosaic(CESD03 ~ TEOSQ13,
+     data = track, 
+     direction = c("v", "h"),
+     labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
+     highlighting_fill = brewer.pal(4, "Blues"),
+     main = "Track: CESD03 vs. TEOSQ13")
+
+dance <- vars_by_sport(df, "Dance", "CESD03", "TEOSQ13")
+vcd::mosaic(CESD03 ~ TEOSQ13,
+     data = dance, direction = c("v", "h"),
+     labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
+     highlighting_fill = brewer.pal(4, "Blues"),
+     main = "Dance: CESD03 vs. TEOSQ13")
+
+#Track vs. Dance responses to MH questions as pairs mosaic plot
+MH_responses[,c(2:12)] %>% 
+  filter(PSPORT == "Track" | PSPORT == "Dance") %>%
+  table() %>% pairs(space = .2,
+        lower_panel = pairs_mosaic(highlighting = 2, spacing = spacing_equal(0)),
+        upper_panel = pairs_mosaic(spacing = spacing_equal(0)),
+        diag_panel = pairs_barplot(
+          gp_vartext = gpar(fontsize = 8),
+          gp_leveltext = gpar(fontsize = 8),
+          abbreviate = 2))
+
+```
