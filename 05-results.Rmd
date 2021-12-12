@@ -8,6 +8,7 @@ library(vcd)
 library(RColorBrewer)
 library(ggplot2)
 library(gridExtra)
+library(cowplot)
 ``` 
 
 ```{r}
@@ -237,6 +238,7 @@ df_sports <- df_sports %>%
 
 ```{r}
 ##Demographics breakdown
+library(ggthemes)
 
 df$RACE <- recode_factor(df$RACE, 
                          `White` = "(4) White or Caucasian",
@@ -248,14 +250,17 @@ df$RACE <- recode_factor(df$RACE,
 s1<- ggplot(df, aes(AGE)) +
   geom_bar() +
   xlab("Age") +
-  ylab("")
+  ylab("") +
+  theme_classic() +
+  scale_x_continuous(breaks=seq(17,25,1)) 
 
 s2<- ggplot(df, aes(fct_recode(SEX, 
                                   `Male` = "(0) Male" , 
                                   `Female` = "(1) Female"))) +
   geom_bar() +
   xlab("Gender") +
-  ylab("")
+  ylab("") +
+  theme_classic()
 
 s3<- ggplot(df, aes(fct_recode(RACE, 
                               White = "(4) White or Caucasian",
@@ -266,8 +271,10 @@ s3<- ggplot(df, aes(fct_recode(RACE,
   geom_bar() +
   xlab("Race") +
   ylab("") +
+  theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+  
 
 s4<- ggplot(df, aes(fct_recode(COLYEAR,
                                `Freshman` = "(1) Freshman",
@@ -278,10 +285,11 @@ s4<- ggplot(df, aes(fct_recode(COLYEAR,
   geom_bar() +
   xlab("Year in College") +
   ylab("") +
+  theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
-grid.arrange(s1, s2, s3, s4, ncol=2, top = textGrob("Demographic Information"))
+grid.arrange(s1, s2, s3, s4, ncol=2, top = textGrob("Respondents Demographic Information"))
 
 
 ```
@@ -297,11 +305,12 @@ Now that we know a little bit about the demographics of respondents, lets take a
 df_sports %>% 
   drop_na(PSPORT) %>% 
   ggplot(aes(x=fct_rev(fct_infreq(PSPORT)))) +
-  geom_bar(fill = "cadetblue4", color = "black") +
+  geom_bar(fill = "#6BAED6", color = "#2171b5") +
   coord_flip() +
   ggtitle("Primary Sport Indicated by Students") +
   ylab("Count") +
-  xlab("Sport")
+  xlab("Sport") +
+  theme_classic()
 
 s5<- ggplot(df_sports, aes(x=fct_infreq(PSPORT))) +
   geom_bar(fill = "cadetblue4", color = "black") +
@@ -356,25 +365,36 @@ s6<- ggplot(df_recentcolsport) +
   scale_fill_manual(values = c("cadetblue3", "cadetblue4")) + 
   ggtitle("Types of sports students participated in within the past year \n at the college or community level") +
   xlab("Sport") +
-  ylab("Count")
+  ylab("Count") +
+  theme_classic()
 
 #s5
 #s6
 
 ```
 
-Students selected a wide variety of sports as their Primary Sport. Each student was only able to elect one sport, however we are not displaying those who did not select any sport as we will only be looking at students with a primary sport. We see that the most popular sports are Basketball, Soccer, Football and Baseball. ....
+Students selected a wide variety of sports as their Primary Sport. Each student was only able to elect one sport, however we are not displaying those who did not select any sport as we will only be looking at students with a primary sport. In addition, we will exclude "Other" sports in the following analyses as we try to investigate how sport types correlate with mental health and other outlook indicators. 
+
+We see that the most popular sports are Basketball, Soccer, Football and Baseball. This makes sense for an American University! 
 
 
 ## Investigating Mental Health Responses 
+
+Our primary questions of interest surround how aspects of sport, performance, and team correlate with Mental Health Indicators. As part of the survey given to students, there were 10 questions that were meant to assess each students mental health. Students were asked to respond to the following prompt:
+
+`"Below is a list of some of the ways you may have felt or behaved recently. Please indicate how often you have felt this way during the past week."`
+
+Let's take a look at how students responded to these questions: 
 
 ```{r}
 #subset to MH response data
 library(HH)
 
-individual_sport <- c('Boxing', 'Bowling','Cross_Country', 'Dance', 'Golf', 'Gymnastics', 'Skiing', 'Swimming', 'Tennis', 'Track', 'Wrestling')
+individual_sport <- c('Boxing', 'Bowling','Cross Country', 'Dance', 'Golf', 'Gymnastics', 'Skiing', 'Swimming', 'Tennis', 'Track', 'Wrestling', 'Equestrian', 'Figure Skating', 'Snowboarding', 'Weightlifting', 'Ping Pong')
 
-MH_responses <- df %>%
+MH_responses <- 0
+
+MH_responses <- as.data.frame(df) %>%
   dplyr::select("CASEID", starts_with("CESD"), "PSPORT") %>%
   mutate(PSPORT = fct_recode(PSPORT,
           `Badminton` = "(01) Badminton",                          
@@ -411,7 +431,7 @@ MH_responses <- df %>%
           `Colorguard` = "(33) Color / Winterguard",
           `Other` = "(66) Other sport")) %>%
   mutate(sport_group = 
-           ifelse(df$PSPORT %in% individual_sport, 'Individual', 'Team')) %>%
+           ifelse(PSPORT %in% individual_sport, 'Individual', 'Team')) %>%
   rename("Bothered by things that \n usually don't bother me" = CESD01,
         "Trouble keeping mind on \n what I was doing" = CESD02,
         "Depressed" = CESD03,
@@ -446,18 +466,81 @@ ggplot(MH_pivot) +
 
 ```
 
-Add discussion of graph here. Transition to self made scores to see if MH correlates with any other behaviors
 
-
-## Investigating Sport Motivation, Perspectives on Success, Behavior Patterns, and Mental Health for All Athletes 
-
-In effort to assess how factors related to sports and sport performance are related to an athletes mental health, we gave all respondents the following scores based on their responses to the survey questions:
-
-* Mental Health Score -- Mental Health questions were posed in the following manner: `"Below is a list of some of the ways you may have felt or behaved recently. Please indicate how often you have felt this way during the past week."` Based on the feeling, we assigned scores that were positive to indicate positive mental health outlook versus negative scores to indicate a negative outlook on mental health. For example, if a respondent answered "I was happy" with "All of the time" they would get +2 points, versus a response of "Rarely or None of the Time" would get -2 points. 
-
-* .... 
 
 ```{r}
+#view MH responses for team vs. individual sports 
+
+MH_pivot_team <- MH_responses[] %>% 
+  pivot_longer(!c(CASEID, sport_group, PSPORT), names_to="Questions", values_to="Answer") %>%
+  group_by(Questions, Answer, sport_group) %>%
+  summarize(Count=n()) %>%
+  ungroup() %>%
+  mutate(Answer = fct_recode(Answer, 
+              `1-Rarely or none \n of the time` = "(1) Rarely or none of the time (less than 1 day)",
+              `2-Some or a little \n of the time` = "(2) Some or a little of the time (1-2 days)",
+              `3-Occasionally or \n moderate amount \n of time` = "(3) Occasionally or a moderate amount of time (3-4 days)", 
+              `4 All of \n the time` = "(4) All of the time (5-7 days)")) 
+
+ggplot(MH_pivot_team) +
+  geom_bar(aes(x = reorder(Questions, Count), y=-Count, fill=Answer), color="black", position="stack", stat="identity") +
+  facet_grid(~sport_group, scales = "free_x") +
+  coord_flip() + 
+  ggtitle("Survey Responses to MH Questions") +
+  ylab("") +
+  xlab("Questions") +
+  scale_fill_brewer(palette="Blues") +
+  theme_classic() +
+  theme(legend.position= "bottom", legend.justification = "left", axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
+
+```
+
+```{r}
+MH_pivot_dt <- MH_responses[] %>% 
+  pivot_longer(!c(CASEID, sport_group, PSPORT), names_to="Questions", values_to="Answer") %>%
+  group_by(Questions, Answer, PSPORT) %>%
+  summarize(Count=n()) %>%
+  ungroup() %>%
+  mutate(Answer = fct_recode(Answer, 
+              `1-Rarely or none \n of the time` = "(1) Rarely or none of the time (less than 1 day)",
+              `2-Some or a little \n of the time` = "(2) Some or a little of the time (1-2 days)",
+              `3-Occasionally or \n moderate amount \n of time` = "(3) Occasionally or a moderate amount of time (3-4 days)", 
+              `4 All of \n the time` = "(4) All of the time (5-7 days)")) %>%
+  filter(PSPORT == "Dance" | PSPORT == "Track")
+
+ggplot(MH_pivot_dt) +
+  geom_bar(aes(x = reorder(Questions, Count), y=-Count, fill=Answer), color="black", position="stack", stat="identity") +
+  facet_grid(~PSPORT, scales = "free_x") +
+  coord_flip() + 
+  ggtitle("Survey Responses to MH Questions") +
+  ylab("") +
+  xlab("Questions") +
+  scale_fill_brewer(palette="Blues") +
+  theme_classic() +
+  theme(legend.position= "bottom", legend.justification = "left", axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
+```
+
+
+Add discussion of graph or graphs here. Transition to self made scores to see if MH correlates with any other behaviors
+
+
+## Investigating Sport Motivation, Perspectives on Success, Behavior Patterns, and Mental Health for Athletes 
+
+In effort to assess how factors related to sports and sport performance are related to an athletes mental health, we created a scoring formula for all students based on their responses to the survey questions:
+
+* Mental Health Score -- Mental Health questions were posed in the following manner: 
+`"Below is a list of some of the ways you may have felt or behaved recently. Please indicate how often you have felt this way during the past week."`
+Based on the feeling, we assigned scores that were positive to indicate positive mental health outlook versus negative scores to indicate a negative outlook on mental health. For example, if a respondent answered "I was happy" with "All of the time" they would get +2 points, versus a response of "Rarely or None of the Time" would get -2 points. In summary, a high mental health score denotes a positive mental health outlook.
+
+* Internal Motivation Score -- 
+
+* Risk Averse Score -- 
+
+* Success through Hardwork Score -- 
+
+```{r, fig.width = 5, fig.asp = .62}
 #Primary Sport Analysis
 
 df_scores <- df_sports %>%
@@ -477,48 +560,83 @@ df_mh_scores <- df_scores %>%
   unique() %>%
   filter(!is.na(PSPORT))
 
-ggplot(df_mh_scores, aes(x = reorder(PSPORT, -avg_mh), y = avg_mh, fill = sport_group)) +
+g1 <- ggplot(df_mh_scores, aes(x = reorder(PSPORT, -avg_mh), y = avg_mh, fill = sport_group)) +
   geom_col() +
   geom_hline(yintercept = mean(df_mh_scores$avg_mh), col="tomato1") +
-  scale_fill_manual(values = c("darkseagreen2", "steelblue3")) + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  scale_fill_manual(values = c("royalblue4", "lightskyblue")) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position = "none")
 
 df_motiv_scores <- df_scores %>%
-  dplyr::select("PSPORT", avg_motiv, sport_group) %>%
+  dplyr::select("PSPORT", avg_motiv, sport_group, avg_mh) %>%
   unique() %>%
   filter(!is.na(PSPORT))
 
-ggplot(df_motiv_scores, aes(x = reorder(PSPORT, -avg_motiv), y = avg_motiv, fill = sport_group)) +
+g2 <- ggplot(df_motiv_scores, aes(x = reorder(PSPORT, -avg_mh), y = avg_motiv, fill = sport_group)) +
   geom_col() +
   geom_hline(yintercept = mean(df_motiv_scores$avg_motiv), col="tomato1") +
-  scale_fill_manual(values = c("darkseagreen2", "steelblue3")) + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  scale_fill_manual(values = c("royalblue4", "lightskyblue")) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position = "none")
 
 df_success_scores <- df_scores %>%
-  dplyr::select("PSPORT", avg_success, sport_group) %>%
+  dplyr::select("PSPORT", avg_success, sport_group, avg_mh) %>%
   unique() %>%
   filter(!is.na(PSPORT))
 
-ggplot(df_success_scores, aes(x = reorder(PSPORT, -avg_success), y = avg_success, fill = sport_group)) +
+g3<- ggplot(df_success_scores, aes(x = reorder(PSPORT, -avg_mh), y = avg_success, fill = sport_group)) +
   geom_col() +
   geom_hline(yintercept = mean(df_success_scores$avg_success), col="tomato1") +
-  scale_fill_manual(values = c("darkseagreen2", "steelblue3")) + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  scale_fill_manual(values = c("royalblue4", "lightskyblue")) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position = "none")
 
 df_risk_scores <- df_scores %>%
-  dplyr::select("PSPORT", avg_risk, sport_group) %>%
+  dplyr::select("PSPORT", avg_risk, sport_group, avg_mh) %>%
   unique() %>%
   filter(!is.na(PSPORT))
 
-ggplot(df_risk_scores, aes(x = reorder(PSPORT, -avg_risk), y = avg_risk, fill = sport_group)) +
+g4 <- ggplot(df_risk_scores, aes(x = reorder(PSPORT, -avg_mh), y = avg_risk, fill = sport_group)) +
   geom_col() +
   geom_hline(yintercept = mean(df_risk_scores$avg_risk), col="tomato1") +
-  scale_fill_manual(values = c("darkseagreen2", "steelblue3")) + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  scale_fill_manual(values = c("royalblue4", "lightskyblue")) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position = "bottom")
+
+
+#plot_grid(g1, g2, g3, g4, labels=c(1, 2, 3, 4), ncol = 2, nrow= 2)
 
 ```
 
-Discuss how sports appear in various scoring, check correlation between scores.
+```{r, fig.width = 4, fig.asp = .5}
+#try side by side bar chart for scores 
+df_score_pivot <- df_scores[,c(1:2, 7:11)] %>%
+  pivot_longer(!c(PSPORT,sport_group, CASEID), names_to="Assessment", values_to="Score") %>%
+  group_by(PSPORT) %>%
+  mutate(Assessment = as.factor(Assessment)) %>%
+  mutate(Assessment = fct_recode(Assessment, 
+                                `Mental Health \n Score` = "avg_mh",
+                                `Motivated Internally` = "avg_motiv",
+                                `Risk Averse` = "avg_risk",
+                                `Success \n Through Hardwork` = "avg_success")) %>%
+  filter(PSPORT!="NA", PSPORT !="Other")
+
+
+
+ggplot(data = df_score_pivot) +
+  geom_col(aes(x = PSPORT, y = Score, fill = Assessment), color = "black", position="dodge", size = .25) +
+  facet_grid(~sport_group, scales="free_x", space = "free_x") +
+  geom_hline(yintercept = mean(df_scores$avg_mh), col="grey", size =.25, alpha = 1) +
+  geom_hline(yintercept = mean(df_scores$avg_motiv), col="#bdd7e7", size =.25, alpha = 1) +
+  geom_hline(yintercept = mean(df_scores$avg_risk), col="#6baed6", size =.25, alpha = 1) +
+  geom_hline(yintercept = mean(df_scores$avg_success), col="#2171b5", size =.25, alpha = 1) +
+  theme_classic(9) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Health & Life Outlook Scores Across Sports") +
+  ylab("Average Score") +
+  xlab("Sport") +
+  scale_fill_brewer(palette="Blues") 
+  
+#panel.background = element_rect(fill = "gainsboro")
+```
+
+* Figure Skating has very high internal motivation score! 
 
 
 ```{r}
