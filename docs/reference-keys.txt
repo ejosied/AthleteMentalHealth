@@ -19,6 +19,7 @@ results
 who-took-this-survey
 investigating-mental-health-responses
 investigating-sport-motivation-perspectives-on-success-behavior-patterns-and-mental-health-for-athletes
-observations-2
 interactive-component
+about-this-interactive-experience
+what-next
 conclusion

@@ -9,6 +9,7 @@ library(RColorBrewer)
 library(ggplot2)
 library(gridExtra)
 library(cowplot)
+library(ggcorrplot)
 ``` 
 
 ```{r}
@@ -480,17 +481,17 @@ MH_pivot_team <- MH_responses[] %>%
               `3-Occasionally or \n moderate amount \n of time` = "(3) Occasionally or a moderate amount of time (3-4 days)", 
               `4 All of \n the time` = "(4) All of the time (5-7 days)")) 
 
-ggplot(MH_pivot_team) +
-  geom_bar(aes(x = reorder(Questions, Count), y=-Count, fill=Answer), color="black", position="stack", stat="identity") +
-  facet_grid(~sport_group, scales = "free_x") +
-  coord_flip() + 
-  ggtitle("Survey Responses to MH Questions") +
-  ylab("") +
-  xlab("Questions") +
-  scale_fill_brewer(palette="Blues") +
-  theme_classic() +
-  theme(legend.position= "bottom", legend.justification = "left", axis.text.x=element_blank(), axis.ticks.x=element_blank(),
-        plot.title = element_text(hjust = 0.5))
+# #ggplot(MH_pivot_team) +
+#   geom_bar(aes(x = reorder(Questions, Count), y=-Count, fill=Answer), color="black", position="stack", stat="identity") +
+#   facet_grid(~sport_group, scales = "free_x") +
+#   coord_flip() + 
+#   ggtitle("Survey Responses to MH Questions") +
+#   ylab("") +
+#   xlab("Questions") +
+#   scale_fill_brewer(palette="Blues") +
+#   theme_classic() +
+#   theme(legend.position= "bottom", legend.justification = "left", axis.text.x=element_blank(), axis.ticks.x=element_blank(),
+#         plot.title = element_text(hjust = 0.5))
 
 
 ```
@@ -508,16 +509,16 @@ MH_pivot_dt <- MH_responses[] %>%
               `4 All of \n the time` = "(4) All of the time (5-7 days)")) %>%
   filter(PSPORT == "Dance" | PSPORT == "Track")
 
-ggplot(MH_pivot_dt) +
-  geom_bar(aes(x = reorder(Questions, Count), y=-Count, fill=Answer), color="black", position="stack", stat="identity") +
-  facet_grid(~PSPORT, scales = "free_x") +
-  coord_flip() + 
-  ggtitle("Survey Responses to MH Questions") +
-  ylab("") +
-  xlab("Questions") +
-  scale_fill_brewer(palette="Blues") +
-  theme_classic() +
-  theme(legend.position= "bottom", legend.justification = "left", axis.text.x=element_blank(), axis.ticks.x=element_blank())
+# #ggplot(MH_pivot_dt) +
+#   geom_bar(aes(x = reorder(Questions, Count), y=-Count, fill=Answer), color="black", position="stack", stat="identity") +
+#   facet_grid(~PSPORT, scales = "free_x") +
+#   coord_flip() + 
+#   ggtitle("Survey Responses to MH Questions") +
+#   ylab("") +
+#   xlab("Questions") +
+#   scale_fill_brewer(palette="Blues") +
+#   theme_classic() +
+#   theme(legend.position= "bottom", legend.justification = "left", axis.text.x=element_blank(), axis.ticks.x=element_blank())
 
 ```
 
@@ -604,6 +605,68 @@ g4 <- ggplot(df_risk_scores, aes(x = reorder(PSPORT, -avg_mh), y = avg_risk, fil
 ```
 
 ```{r}
+#try correlation plots for MH scores 
+
+#library(corrplot)
+
+#calculate pairwaise correlation values for mh score columns and store as matrix 
+MH_corr <- df_scores[,c(8:11)] %>%
+  rename(`Mental Health Score` = "avg_mh", 
+         `Motivation Score` = "avg_motiv", 
+         `Outlook on Success Score` = "avg_success",
+         `Risk Avoidance Score` = "avg_risk") %>%
+  cor(., use = "pairwise.complete.obs")
+
+#option 1
+# M = cor(MH_corr)
+# corrplot(M, order = 'hclust', addrect = 2)
+
+# #option 2
+# c1 <- ggcorrplot(MH_corr,
+#            hc.order = TRUE,
+#            lab = TRUE) +
+#   scale_color_brewer(palette= "Blues")
+# 
+# #check per sport type for differences? 
+# MH_team_corr <- df_scores %>%
+#   filter(sport_group == 'Team') 
+# 
+# MH_team_corr <- MH_team_corr[,c(8:11)] %>%
+#   cor(., use = "pairwise.complete.obs")
+# 
+# c2<- ggcorrplot(MH_team_corr,
+#            hc.order = TRUE,
+#            lab = TRUE)
+# 
+# MH_ind_corr <- df_scores %>%
+#   filter(sport_group == 'Individual')
+# 
+# MH_ind_corr <- MH_ind_corr[,c(8:11)] %>%
+#   cor(., use = "pairwise.complete.obs")
+# 
+# c3 <- ggcorrplot(MH_ind_corr,
+#                  hc.order = TRUE,
+#                  lab = TRUE)
+
+#c1 + ggtitle('Correlation for All Athletes')
+ # c2 + ggtitle('Correlation for Team Athletes')
+# c3 + ggtitle('Correlation for Individual Athletes')
+
+
+ggcorrplot(MH_corr, hc.order = TRUE, type = "lower", colors = c("coral3", "grey99", "royalblue1"), lab = TRUE, insig = "blank") + 
+  ggtitle("Correlation Between Assessment Types Across Team Averages") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+We were interested in understanding how these indicators correlated with eachother and most importantly with mental health scores. Unfortunately, there seems to be only a loose correlation between Mental Health Scores and the various indicators. The strongest being a positive correlation (0.62) between mental health and motivation. 
+
+The strongest correlation observed overall is between Motivation and Outlook on Success. Higher scores in these two categories mean motivation is mostly coming from within (versus external motivation) and that success comes from hardwork and training (versus pure skill or talent), respectively. This makes sense intuitively because if someone has internal motivation to do something, they likely use that motivation to work at whatever the skill or task is. 
+
+Now looking deeper at these scores across sports and sport type we can draw a few conclusions. 
+
+
+```{r}
 #try side by side bar chart for scores 
 df_score_pivot <- df_scores[,c(1:2, 7:11)] %>%
   pivot_longer(!c(PSPORT,sport_group, CASEID), names_to="Assessment", values_to="Score") %>%
@@ -617,22 +680,80 @@ df_score_pivot <- df_scores[,c(1:2, 7:11)] %>%
   filter(PSPORT!="NA", PSPORT !="Other")
 
 
-
-ggplot(data = df_score_pivot) +
-  geom_col(aes(x = PSPORT, y = Score, fill = Assessment), color = "black", position="dodge", size = .25) +
-  facet_grid(~sport_group, scales="free_x", space = "free_x") +
+# #single plot
+# ggplot(data = df_score_pivot) +
+#   geom_col(aes(x = PSPORT, y = Score, fill = Assessment), color = "black", position="dodge", size = .25) +
+#   facet_grid(~sport_group, scales="free_x", space = "free_x") +
+#   geom_hline(yintercept = mean(df_scores$avg_mh), col="grey", size =.25, alpha = 1) +
+#   geom_hline(yintercept = mean(df_scores$avg_motiv), col="#bdd7e7", size =.25, alpha = 1) +
+#   geom_hline(yintercept = mean(df_scores$avg_risk), col="#6baed6", size =.25, alpha = 1) +
+#   geom_hline(yintercept = mean(df_scores$avg_success), col="#2171b5", size =.25, alpha = 1) +
+#   theme_classic(9) +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
+#   ggtitle("Health & Life Outlook Scores Across Sports") +
+#   ylab("Average Score") +
+#   xlab("Sport") +
+#   scale_fill_brewer(palette="Blues") 
+# 
+# #two plots
+# ggplot(data = df_score_pivot %>% filter(sport_group == "Team")) +
+#   geom_col(aes(x = PSPORT, y = Score, fill = Assessment), color = "black", position="dodge", size = .25) +
+#   geom_hline(yintercept = mean(df_scores$avg_mh), col="grey", size =.25, alpha = 1) +
+#   geom_hline(yintercept = mean(df_scores$avg_motiv), col="#bdd7e7", size =.25, alpha = 1) +
+#   geom_hline(yintercept = mean(df_scores$avg_risk), col="#6baed6", size =.25, alpha = 1) +
+#   geom_hline(yintercept = mean(df_scores$avg_success), col="#2171b5", size =.25, alpha = 1) +
+#   theme_classic(9) +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
+#   ggtitle("Health & Life Outlook Scores Across Team Type Sports") +
+#   ylab("Average Score") +
+#   xlab("Sport") +
+#   scale_fill_brewer(palette="Blues") 
+# 
+# ggplot(data = df_score_pivot %>% filter(sport_group == "Individual")) +
+#   geom_col(aes(x = PSPORT, y = Score, fill = Assessment), color = "black", position="dodge", size = .25) +
+#   geom_hline(yintercept = mean(df_scores$avg_mh), col="grey", size =.25, alpha = 1) +
+#   geom_hline(yintercept = mean(df_scores$avg_motiv), col="#bdd7e7", size =.25, alpha = 1) +
+#   geom_hline(yintercept = mean(df_scores$avg_risk), col="#6baed6", size =.25, alpha = 1) +
+#   geom_hline(yintercept = mean(df_scores$avg_success), col="#2171b5", size =.25, alpha = 1) +
+#   theme_classic(9) +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
+#   ggtitle("Health & Life Outlook Scores Across Individual Type Sports") +
+#   ylab("Average Score") +
+#   xlab("Sport") +
+#   scale_fill_brewer(palette="Blues") 
+  
+#dotplot view & separate into two plots for easier reading
+ggplot(data = df_score_pivot %>% filter(sport_group == "Team")) +
+  geom_point(aes(x = PSPORT, y = Score, color = Assessment), size = 3) +
   geom_hline(yintercept = mean(df_scores$avg_mh), col="grey", size =.25, alpha = 1) +
   geom_hline(yintercept = mean(df_scores$avg_motiv), col="#bdd7e7", size =.25, alpha = 1) +
   geom_hline(yintercept = mean(df_scores$avg_risk), col="#6baed6", size =.25, alpha = 1) +
   geom_hline(yintercept = mean(df_scores$avg_success), col="#2171b5", size =.25, alpha = 1) +
-  theme_classic(9) +
+  coord_flip() +
+  theme_bw(9) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
-  ggtitle("Health & Life Outlook Scores Across Sports") +
+  ggtitle("Health & Life Outlook Scores Across Team Sports") +
   ylab("Average Score") +
   xlab("Sport") +
-  scale_fill_brewer(palette="Blues") 
-  
-#panel.background = element_rect(fill = "gainsboro")
+  scale_color_brewer(palette="Set2") 
+
+#fix axis and sort more thoughfully
+
+ggplot(data = df_score_pivot %>% filter(sport_group == "Individual")) +
+  geom_point(aes(x = PSPORT, y = Score, color = Assessment), size = 3) +
+  geom_hline(yintercept = mean(df_scores$avg_mh), col="grey", size =.25, alpha = 1) +
+  geom_hline(yintercept = mean(df_scores$avg_motiv), col="#bdd7e7", size =.25, alpha = 1) +
+  geom_hline(yintercept = mean(df_scores$avg_risk), col="#6baed6", size =.25, alpha = 1) +
+  geom_hline(yintercept = mean(df_scores$avg_success), col="#2171b5", size =.25, alpha = 1) +
+  coord_flip() +
+  theme_bw(9) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Health & Life Outlook Scores Across Individual Sports") +
+  ylab("Average Score") +
+  xlab("Sport") +
+  scale_color_brewer(palette="Set2") 
+
+
 ```
 
 In looking at this plot, there are many interesting things to note.
@@ -687,16 +808,27 @@ df_score_pivot2 <- df_score_gender[,c(1:2, 8:12)] %>%
   #filter(PSPORT!="NA", PSPORT !="Other") %>%
   filter(PSPORT %in% c("Basketball", "Golf", "Boxing", "Rugby", "Soccer", "Swimming", "Track", "Lacrosse", "Volleyball", "Baseball", "Softball"))
 
+# ggplot(data = df_score_pivot2) +
+#   geom_col(aes(x = PSPORT, y = Score, fill = Assessment), color = "black", position="dodge", size = .25) +
+#   facet_wrap(~SEX, scales="free_x") +
+#   theme_classic(9) +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
+#   ggtitle("Health & Life Outlook Scores for Select Sports by Gender") +
+#   ylab("Average Score") +
+#   xlab("Sport") +
+#   scale_fill_brewer(palette="Blues") 
+
+#try dotplot to see what it looks like
 ggplot(data = df_score_pivot2) +
-  geom_col(aes(x = PSPORT, y = Score, fill = Assessment), color = "black", position="dodge", size = .25) +
-  facet_wrap(~SEX, scales="free_x") +
-  theme_classic(9) +
+  geom_point(aes(x = PSPORT, y = Score, color = Assessment), size = 3, alpha =.5) +
+  facet_wrap(~SEX, nrow = 2) +
+  coord_flip() +
+  theme_bw(9) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
   ggtitle("Health & Life Outlook Scores for Select Sports by Gender") +
   ylab("Average Score") +
   xlab("Sport") +
-  scale_fill_brewer(palette="Blues") 
-
+  scale_color_brewer(palette="Set2")
 ```
 
 There is one assessment that clearly differs between men and women: risk tolerance! For all sports that have male and female participants, the males are more risk tolerant than the females are. This outcome is not incredibly surprising, however it is interesting to see that no female sport averages fell into the negative area. The closest were female rugby players. Based on the nature of rugby, this seems reasonable. 
@@ -704,6 +836,103 @@ There is one assessment that clearly differs between men and women: risk toleran
 For some sports like soccer, females have a lower mental health score than males in their sport, however this is not consistent across all sports. When we compare baseketball we see that female baseketball players have a higher mental health score. So we cannot say that that one or the other gender has better or worse mental health outlooks. 
 
 We also see that male swimmers skew towards an ego-centered view on success. The next closest are female and male golfers. 
+
+we wondered whether there were any insights to be gained from checking whether year in college was correlated with these indicators.
+
+```{r}
+df_score_year<- df_sports %>%
+  dplyr::select("CASEID", "PSPORT", "Mental Health Score", "Motivation Score", "Success Score", "Risk Behavior Score", "sport_group", "COLYEAR") %>%
+  group_by(PSPORT, COLYEAR) %>%
+  mutate(avg_mh = mean(`Mental Health Score`)) %>%
+  group_by(PSPORT, COLYEAR) %>%
+  mutate(avg_motiv = mean(`Motivation Score`)) %>%
+  group_by(PSPORT, COLYEAR) %>%
+  mutate(avg_success = mean(`Success Score`)) %>%
+  group_by(PSPORT, COLYEAR) %>%
+  mutate(avg_risk = mean(`Risk Behavior Score`)) %>%
+  distinct(CASEID, PSPORT, COLYEAR, .keep_all = TRUE) %>%
+  drop_na()
+
+df_year_pivot <- df_score_year[,c(1:2, 8:12)] %>%
+  pivot_longer(!c(PSPORT, CASEID, COLYEAR), names_to="Assessment", values_to="Score") %>%
+  group_by(PSPORT) %>%
+  mutate(Assessment = as.factor(Assessment)) %>%
+  mutate(Assessment = fct_recode(Assessment, 
+                                `Mental Health \n Score` = "avg_mh",
+                                `Motivated Internally` = "avg_motiv",
+                                `Risk Averse` = "avg_risk",
+                                `Success \n Through Hardwork` = "avg_success")) %>%
+  mutate(COLYEAR = fct_recode(COLYEAR,
+                               `Freshman` = "(1) Freshman",
+                               `Sophomore` = "(2) Sophomore", 
+                               `Junior` = "(3) Junior", 
+                               `Senior` = "(4) Senior",
+                               `Other` = "(5) Other")) %>%
+  filter(PSPORT != "Other")
+
+ggplot(data = df_year_pivot %>%
+         filter(COLYEAR == "Freshman")) +
+  geom_point(aes(x = PSPORT, y = Score, color = Assessment)) +
+ # facet_wrap(~COLYEAR, scales="free_x", nrow = 2) +
+  coord_flip() +
+  theme_bw(9) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Health & Life Outlook Scores for Select Sports - Freshman") +
+  ylab("Average Score") +
+  xlab("Sport") +
+  scale_color_brewer(palette="Set2") 
+
+ggplot(data = df_year_pivot %>%
+         filter(COLYEAR == "Sophomore")) +
+  geom_point(aes(x = PSPORT, y = Score, color = Assessment)) +
+ # facet_wrap(~COLYEAR, scales="free_x", nrow = 2) +
+  coord_flip() +
+  theme_bw(9) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Health & Life Outlook Scores for Sports - Sophomore") +
+  ylab("Average Score") +
+  xlab("Sport") +
+  scale_color_brewer(palette="Set2") 
+
+ggplot(data = df_year_pivot %>%
+         filter(COLYEAR == "Junior")) +
+  geom_point(aes(x = PSPORT, y = Score, color = Assessment)) +
+  #facet_wrap(~COLYEAR, scales="free_x", nrow = 2) +
+  coord_flip() +
+  theme_bw(9) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Health & Life Outlook Scores for Sports - Junior") +
+  ylab("Average Score") +
+  xlab("Sport") +
+  scale_color_brewer(palette="Set2")
+
+ggplot(data = df_year_pivot %>%
+         filter(COLYEAR == "Senior")) +
+  geom_point(aes(x = PSPORT, y = Score, color = Assessment)) +
+  #facet_wrap(~COLYEAR, scales="free_x", nrow = 2) +
+  coord_flip() +
+  theme_bw(9) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Health & Life Outlook Scores for Sports - Junior") +
+  ylab("Average Score") +
+  xlab("Sport") +
+  scale_color_brewer(palette="Set2")
+
+ggplot(data = df_year_pivot %>%
+         filter(COLYEAR == "Other")) +
+  geom_point(aes(x = PSPORT, y = Score, color = Assessment), size = 3) +
+  theme_bw(9) +
+  coord_flip() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Health & Life Outlook Scores for Sports - Other") +
+  ylab("Average Score") +
+  xlab("Sport") +
+  scale_color_brewer(palette="Set2") 
+
+
+
+```
+
 
 
 ```{r}
@@ -747,10 +976,10 @@ MH_responses2 <- as.data.frame(df) %>%
           `Other` = "(66) Other sport")) %>%
   mutate(sport_group = 
            ifelse(PSPORT %in% individual_sport, 'Individual', 'Team')) %>%
-  rename("Bothered by things that \n usually don't bother me" = CESD01,
-        "Trouble keeping mind on \n what I was doing" = CESD02,
+  rename("Bothered by \n things that usually \n don't bother me" = CESD01,
+        "Trouble keeping \n mind on what \n I was doing" = CESD02,
         "Depressed" = CESD03,
-        "Everything was an effort" = CESD04,
+        "Everything was \n an effort" = CESD04,
         "Hopeful about future" = CESD05,
         "Fearful" = CESD06,
         "Sleep was restless" = CESD07,
@@ -772,141 +1001,103 @@ MH_pivot2 <- MH_responses2[,c(1:13)] %>%
                             Sometimes = "(2) Some or a little of the time (1-2 days)",
                             Occasionally = "(3) Occasionally or a moderate amount of time (3-4 days)", 
                             Always = "(4) All of the time (5-7 days)")) %>%
-  filter(PSPORT %in% c("Dance", "Track", "Golf", "Rugby", "Soccer", "Colorguard"))
+  filter(Assessment %in% c("Happy", "Fearful", "Hopeful about future", "Depressed", "Lonely"))
 
-ggplot(MH_pivot2, aes(x = Assessment, stratum = Score, alluvium = CASEID,
+
+ggplot(data = (MH_pivot2 %>% filter(PSPORT == "Dance")), aes(x = Assessment, stratum = fct_rev(Score), alluvium = CASEID,
                           y = Freq, 
-                      fill = PSPORT, label = Score)) +
+                      fill = Score, label = Score)) +
   geom_flow() +
-  coord_flip() +
+  #coord_flip() +
   geom_stratum(alpha = 0.5) +
-  geom_text(stat = "stratum", size = 2) 
-  
+  geom_text(stat = "stratum", size = 2) +
+  scale_fill_brewer(palette = "Set2") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ggtitle("Survey Response Path for Mental Health Questions - Dance")
 
+ggplot(data = (MH_pivot2 %>% filter(PSPORT == "Baseball")), aes(x = Assessment, stratum = fct_rev(Score), alluvium = CASEID,
+                          y = Freq, 
+                      fill = Score, label = Score)) +
+  geom_flow() +
+  #coord_flip() +
+  geom_stratum(alpha = 0.5) +
+  geom_text(stat = "stratum", size = 2) +
+  scale_fill_brewer(palette = "Set2") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ggtitle("Survey Response Path for Mental Health Questions - Baseball")
 
 ```
 
 
-```{r}
-#try correlation plots for MH scores 
-library(ggcorrplot)
-library(corrplot)
 
-#calculate pairwaise correlation values for mh score columns and store as matrix 
-MH_corr <- df_scores[,c(8:11)] %>%
-  cor(., use = "pairwise.complete.obs")
 
-#option 1
-# M = cor(MH_corr)
-# corrplot(M, order = 'hclust', addrect = 2)
-
-#option 2
-g1 <- ggcorrplot(MH_corr,
-           hc.order = TRUE,
-           lab = TRUE)
-
-#check per sport type for differences? 
-MH_team_corr <- df_scores %>%
-  filter(sport_group == 'Team')
-
-MH_team_corr <- MH_team_corr[,c(8:11)] %>%
-  cor(., use = "pairwise.complete.obs")
-
-g2<- ggcorrplot(MH_team_corr,
-           hc.order = TRUE,
-           lab = TRUE)
-
-MH_ind_corr <- df_scores %>%
-  filter(sport_group == 'Individual')
-
-MH_ind_corr <- MH_ind_corr[,c(8:11)] %>%
-  cor(., use = "pairwise.complete.obs")
-
-g3 <- ggcorrplot(MH_ind_corr,
-                 hc.order = TRUE,
-                 lab = TRUE)
-
-g1 + ggtitle('Correlation for All Athletes')
-# g2 + ggtitle('Correlation for Team Athletes')
-# g3 + ggtitle('Correlation for Individual Athletes')
-```
-
-## Observations:
-
-* Mental Health Scores as we have defined them are not strongly correlated for Individual Athletes with feelings about athletic success scores, motivation for participating in sports scores, or propensity for risk scores (correlation scores are close to zero, denoting no correlation). At first, this seems surprising, however after some thought you will realize that Individual Athletes are quite varied because they are competing individually! There are some athletes who compete individually who are very self-centered and ego focused (low success score) while some may have a much more hardworking attitude about their sport where they view their success as 
-
-* However, for Team athletes, there is a moderate correlation between mental health and feelings about athletic success, as well as between mental health and motivation for participation in sports scores (~.5 correlation). This is interpreted as an increase in positive outlook (high MH score) being loosely positively correlated with feelings about athletic success due to hard work. In the other direction, a negative outlook on mental health is loosely correlated with athletic success coming from an ego-centric view. 
-
-....
-
-Transition to looking at Track and Dance only. 
 
 ```{r}
-# data frames by sport for q1: mental health vs. thoughts on sports
-
-# depression frequency vs. importance of fun
-track <- vars_by_sport(df, "Track", "CESD03", "MPSQ17")
-vcd::mosaic(CESD03 ~ MPSQ17,
-     data = track, direction = c("v", "h"),
-     labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
-     highlighting_fill = brewer.pal(4, "Blues"),
-     main = "Track: CESD03 vs. MPSQ17")
-
-dance <- vars_by_sport(df, "Dance", "CESD03", "MPSQ17")
-vcd::mosaic(CESD03 ~ MPSQ17,
-     data = dance, direction = c("v", "h"),
-     labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
-     highlighting_fill = brewer.pal(4, "Blues"),
-     main = "Dance: CESD03 vs. MPSQ17")
-
-
-# depression frequency vs. not letting parents down
-track <- vars_by_sport(df, "Track", "CESD03", "MPSQ19")
-vcd::mosaic(CESD03 ~ MPSQ19,
-     data = track, direction = c("v", "h"),
-     labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
-     highlighting_fill = brewer.pal(4, "Blues"),
-     main = "Track: CESD03 vs. MPSQ19")
-
-dance <- vars_by_sport(df, "Dance", "CESD03", "MPSQ19")
-vcd::mosaic(CESD03 ~ MPSQ19,
-     data = dance, direction = c("v", "h"),
-     labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
-     highlighting_fill = brewer.pal(4, "Blues"),
-     main = "Dance: CESD03 vs. MPSQ19")
-
-
-# depression frequency vs. thinking of oneself as the best
-track <- vars_by_sport(df, "Track", "CESD03", "TEOSQ11")
-vcd::mosaic(CESD03 ~ TEOSQ11,
-     data = track, direction = c("v", "h"),
-     labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
-     highlighting_fill = brewer.pal(4, "Blues"),
-     main = "Track: CESD03 vs. TEOSQ11")
-
-dance <- vars_by_sport(df, "Dance", "CESD03", "TEOSQ11")
-vcd::mosaic(CESD03 ~ TEOSQ11,
-     data = dance, direction = c("v", "h"),
-     labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
-     highlighting_fill = brewer.pal(4, "Blues"),
-     main = "Dance: CESD03 vs. TEOSQ11")
-
-
-# depression frequency vs. doing one's best
-track <- vars_by_sport(df, "Track", "CESD03", "TEOSQ13")
-vcd::mosaic(CESD03 ~ TEOSQ13,
-     data = track, 
-     direction = c("v", "h"),
-     labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
-     highlighting_fill = brewer.pal(4, "Blues"),
-     main = "Track: CESD03 vs. TEOSQ13")
-
-dance <- vars_by_sport(df, "Dance", "CESD03", "TEOSQ13")
-vcd::mosaic(CESD03 ~ TEOSQ13,
-     data = dance, direction = c("v", "h"),
-     labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
-     highlighting_fill = brewer.pal(4, "Blues"),
-     main = "Dance: CESD03 vs. TEOSQ13")
+# # data frames by sport for q1: mental health vs. thoughts on sports
+# 
+# # depression frequency vs. importance of fun
+# track <- vars_by_sport(df, "Track", "CESD03", "MPSQ17")
+# vcd::mosaic(CESD03 ~ MPSQ17,
+#      data = track, direction = c("v", "h"),
+#      labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
+#      highlighting_fill = brewer.pal(4, "Blues"),
+#      main = "Track: CESD03 vs. MPSQ17")
+# 
+# dance <- vars_by_sport(df, "Dance", "CESD03", "MPSQ17")
+# vcd::mosaic(CESD03 ~ MPSQ17,
+#      data = dance, direction = c("v", "h"),
+#      labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
+#      highlighting_fill = brewer.pal(4, "Blues"),
+#      main = "Dance: CESD03 vs. MPSQ17")
+# 
+# 
+# # depression frequency vs. not letting parents down
+# track <- vars_by_sport(df, "Track", "CESD03", "MPSQ19")
+# vcd::mosaic(CESD03 ~ MPSQ19,
+#      data = track, direction = c("v", "h"),
+#      labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
+#      highlighting_fill = brewer.pal(4, "Blues"),
+#      main = "Track: CESD03 vs. MPSQ19")
+# 
+# dance <- vars_by_sport(df, "Dance", "CESD03", "MPSQ19")
+# vcd::mosaic(CESD03 ~ MPSQ19,
+#      data = dance, direction = c("v", "h"),
+#      labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
+#      highlighting_fill = brewer.pal(4, "Blues"),
+#      main = "Dance: CESD03 vs. MPSQ19")
+# 
+# 
+# # depression frequency vs. thinking of oneself as the best
+# track <- vars_by_sport(df, "Track", "CESD03", "TEOSQ11")
+# vcd::mosaic(CESD03 ~ TEOSQ11,
+#      data = track, direction = c("v", "h"),
+#      labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
+#      highlighting_fill = brewer.pal(4, "Blues"),
+#      main = "Track: CESD03 vs. TEOSQ11")
+# 
+# dance <- vars_by_sport(df, "Dance", "CESD03", "TEOSQ11")
+# vcd::mosaic(CESD03 ~ TEOSQ11,
+#      data = dance, direction = c("v", "h"),
+#      labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
+#      highlighting_fill = brewer.pal(4, "Blues"),
+#      main = "Dance: CESD03 vs. TEOSQ11")
+# 
+# 
+# # depression frequency vs. doing one's best
+# track <- vars_by_sport(df, "Track", "CESD03", "TEOSQ13")
+# vcd::mosaic(CESD03 ~ TEOSQ13,
+#      data = track, 
+#      direction = c("v", "h"),
+#      labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
+#      highlighting_fill = brewer.pal(4, "Blues"),
+#      main = "Track: CESD03 vs. TEOSQ13")
+# 
+# dance <- vars_by_sport(df, "Dance", "CESD03", "TEOSQ13")
+# vcd::mosaic(CESD03 ~ TEOSQ13,
+#      data = dance, direction = c("v", "h"),
+#      labeling =  labeling_border(rot_labels = c(0, 90, 0, 0)),
+#      highlighting_fill = brewer.pal(4, "Blues"),
+#      main = "Dance: CESD03 vs. TEOSQ13")
 
 #Track vs. Dance responses to MH questions as pairs mosaic plot
 # MH_responses[,c(2:12)] %>% 
@@ -918,16 +1109,6 @@ vcd::mosaic(CESD03 ~ TEOSQ13,
 #           gp_vartext = gpar(fontsize = 8),
 #           gp_leveltext = gpar(fontsize = 8),
 #           abbreviate = 2))
-
-```
-
-
-
-```{r}
-#attempt alluvial diagram
-
-
-
 
 ```
 
