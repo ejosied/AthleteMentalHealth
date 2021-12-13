@@ -4,6 +4,10 @@
 <iframe width="560" height="292" src="https://vizhub.com/ejosied/523eafd90aa247c4923c1c0d3ff45843?mode=embed" title="Athlete Mental Health D3" frameborder="0" ></iframe>
 
 
+Click the link below for a larger view of the interactive component through VizHub:
+https://vizhub.com/ejosied/523eafd90aa247c4923c1c0d3ff45843
+
+
 ## About this interactive experience
 
 Many atheltes are subject to cliches, stereotypes, and stigmas surrounding certain their sport. The perceived intensity, physical and time demand, and competiveness may lead people to develop ideas about the sport that may or may not align with the athletes' experiences. With this sequence of bar charts, you have the opportunity to see how well your perspective on certain sports matches that of the athletes who contributed their responses to our data.
