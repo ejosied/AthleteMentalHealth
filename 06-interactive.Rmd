@@ -1,3 +1,13 @@
 # Interactive component
 
 
+<iframe width="560" height="292" src="https://vizhub.com/ejosied/523eafd90aa247c4923c1c0d3ff45843?mode=embed" title="Athlete Mental Health D3" frameborder="0" ></iframe>
+
+
+## About this interactive experience
+
+Many atheltes are subject to cliches, stereotypes, and stigmas surrounding certain their sport. The perceived intensity, physical and time demand, and competiveness may lead people to develop ideas about the sport that may or may not align with the athletes' experiences. With this sequence of bar charts, you have the opportunity to see how well your perspective on certain sports matches that of the athletes who contributed their responses to our data.
+
+The survey responses considered here were those assessing whether a individual experiences joy or depression more frequenty, is more internally or externally motivated, and has a healthy or toxic view of success. The indidivuals were then assigned "points" in each catagory; points were awarded for responses indicating a healthy mindset, and deducted for responses indicating an unhealthy mindset. The point value was two when the individual felt strongly about their reponse, one when the individual felt moderately about their reponse, and zero when neutral if applicable. The classification of survey questions as being indicative of "positive" or "negative" mental health is somewhat subjective, but the point system gives an insight into the trends among athletes of a certain sport and allow for comparisons between sports.
+
+The classification of the questions and point value system may be viewed in more detail in the code of the "Results" section.
