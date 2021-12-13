@@ -11,3 +11,8 @@ Many atheltes are subject to cliches, stereotypes, and stigmas surrounding certa
 The survey responses considered here were those assessing whether a individual experiences joy or depression more frequenty, is more internally or externally motivated, and has a healthy or toxic view of success. The indidivuals were then assigned "points" in each catagory; points were awarded for responses indicating a healthy mindset, and deducted for responses indicating an unhealthy mindset. The point value was two when the individual felt strongly about their reponse, one when the individual felt moderately about their reponse, and zero when neutral if applicable. The classification of survey questions as being indicative of "positive" or "negative" mental health is somewhat subjective, but the point system gives an insight into the trends among athletes of a certain sport and allow for comparisons between sports.
 
 The classification of the questions and point value system may be viewed in more detail in the code of the "Results" section.
+
+
+## What next?
+
+These sport-by-sport comparisons give us quick tests of intuition, but by engaging with the interaction for a longer amount of time, you start to get a sense of how all of the sports are related to each other. We encourage you to ask yourself questions about the comparisons you saw. Did you notice any trends? How did the scores differ between team and individual sports? Between traditionally male- and female-dominated sports? Did any of the results surprise you? How will these insights change your perspective moving forward?
