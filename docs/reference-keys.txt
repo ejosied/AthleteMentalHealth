@@ -2,6 +2,7 @@ introduction
 how-are-identification-with-sports-and-mental-health-correlated
 how-are-individualcommunity-connection-to-sports-and-mental-health-correlated
 how-are-demographic-information-and-mental-health-correlated-for-the-student-athletes
+accessing-the-data
 data-sources
 who-is-responsible-for-collecting-the-data-how-is-it-collected
 basic-information-about-the-dataset
@@ -17,7 +18,7 @@ discussion
 results
 who-took-this-survey
 investigating-mental-health-responses
-investigating-sport-motivation-perspectives-on-success-behavior-patterns-and-mental-health-for-all-athletes
+investigating-sport-motivation-perspectives-on-success-behavior-patterns-and-mental-health-for-athletes
 observations-2
 interactive-component
 conclusion

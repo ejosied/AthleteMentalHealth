@@ -225,7 +225,7 @@ df_sports <- df_sports %>%
   mutate(`Risk Behavior Score` = rowSums(dplyr::select(., starts_with("GENRI")), na.rm = TRUE))
 
 #add sport_type to df_sports
-individual_sport <- c('Boxing', 'Bowling','Cross_Country', 'Dance', 'Golf', 'Gymnastics', 'Skiing', 'Swimming', 'Tennis', 'Track', 'Wrestling')
+individual_sport <- c('Boxing', 'Bowling','Cross Country', 'Dance', 'Golf', 'Gymnastics', 'Skiing', 'Swimming', 'Tennis', 'Track', 'Wrestling', 'Equestrian', 'Figure Skating', 'Snowboarding', 'Weightlifting', 'Ping Pong')
 
 df_sports <- df_sports %>% 
   mutate(sport_group = ifelse(df_sports$PSPORT %in% individual_sport, 'Individual', 'Team'))
@@ -248,7 +248,7 @@ df$RACE <- recode_factor(df$RACE,
                          `Mixed` = "(5) Mixed Race")
 
 s1<- ggplot(df, aes(AGE)) +
-  geom_bar() +
+  geom_bar(fill = "#6BAED6") +
   xlab("Age") +
   ylab("") +
   theme_classic() +
@@ -257,7 +257,7 @@ s1<- ggplot(df, aes(AGE)) +
 s2<- ggplot(df, aes(fct_recode(SEX, 
                                   `Male` = "(0) Male" , 
                                   `Female` = "(1) Female"))) +
-  geom_bar() +
+  geom_bar(fill = "#6BAED6") +
   xlab("Gender") +
   ylab("") +
   theme_classic()
@@ -268,7 +268,7 @@ s3<- ggplot(df, aes(fct_recode(RACE,
                               `Black or African American` = "(3) Black or African American",
                               `American Indian / Other` = "(6) American Indian / Native American / Other",
                               `Mixed Race` = "(5) Mixed race" ))) +
-  geom_bar() +
+  geom_bar(fill = "#6BAED6") +
   xlab("Race") +
   ylab("") +
   theme_classic() +
@@ -282,7 +282,7 @@ s4<- ggplot(df, aes(fct_recode(COLYEAR,
                                `Junior` = "(3) Junior", 
                                `Senior` = "(4) Senior",
                                `Other` = "(5) Other"))) + 
-  geom_bar() +
+  geom_bar(fill = "#6BAED6") +
   xlab("Year in College") +
   ylab("") +
   theme_classic() +
@@ -305,15 +305,16 @@ Now that we know a little bit about the demographics of respondents, lets take a
 df_sports %>% 
   drop_na(PSPORT) %>% 
   ggplot(aes(x=fct_rev(fct_infreq(PSPORT)))) +
-  geom_bar(fill = "#6BAED6", color = "#2171b5") +
+  geom_bar(fill = "#6BAED6") + # color = "#2171b5"
   coord_flip() +
   ggtitle("Primary Sport Indicated by Students") +
   ylab("Count") +
   xlab("Sport") +
-  theme_classic()
+  theme_classic(10) +
+  theme(plot.title = element_text(hjust = 0.5))
 
 s5<- ggplot(df_sports, aes(x=fct_infreq(PSPORT))) +
-  geom_bar(fill = "cadetblue4", color = "black") +
+  geom_bar(fill = "cadetblue4") +
   coord_flip() +
   ggtitle("Primary Sport Indicated by Students") +
   ylab("Count") +
@@ -390,10 +391,6 @@ Let's take a look at how students responded to these questions:
 #subset to MH response data
 library(HH)
 
-individual_sport <- c('Boxing', 'Bowling','Cross Country', 'Dance', 'Golf', 'Gymnastics', 'Skiing', 'Swimming', 'Tennis', 'Track', 'Wrestling', 'Equestrian', 'Figure Skating', 'Snowboarding', 'Weightlifting', 'Ping Pong')
-
-MH_responses <- 0
-
 MH_responses <- as.data.frame(df) %>%
   dplyr::select("CASEID", starts_with("CESD"), "PSPORT") %>%
   mutate(PSPORT = fct_recode(PSPORT,
@@ -462,7 +459,8 @@ ggplot(MH_pivot) +
   xlab("Questions") +
   scale_fill_brewer(palette="Blues") +
   theme_classic() +
-  theme(legend.position= "bottom", legend.justification = "left", axis.text.x=element_blank(), axis.ticks.x=element_blank())
+  theme(legend.position= "bottom", legend.justification = "left", axis.text.x=element_blank(), axis.ticks.x=element_blank(), 
+        plot.title = element_text(hjust = 0.5))
 
 ```
 
@@ -491,7 +489,8 @@ ggplot(MH_pivot_team) +
   xlab("Questions") +
   scale_fill_brewer(palette="Blues") +
   theme_classic() +
-  theme(legend.position= "bottom", legend.justification = "left", axis.text.x=element_blank(), axis.ticks.x=element_blank())
+  theme(legend.position= "bottom", legend.justification = "left", axis.text.x=element_blank(), axis.ticks.x=element_blank(),
+        plot.title = element_text(hjust = 0.5))
 
 
 ```
@@ -604,7 +603,7 @@ g4 <- ggplot(df_risk_scores, aes(x = reorder(PSPORT, -avg_mh), y = avg_risk, fil
 
 ```
 
-```{r, fig.width = 4, fig.asp = .5}
+```{r}
 #try side by side bar chart for scores 
 df_score_pivot <- df_scores[,c(1:2, 7:11)] %>%
   pivot_longer(!c(PSPORT,sport_group, CASEID), names_to="Assessment", values_to="Score") %>%
@@ -636,7 +635,156 @@ ggplot(data = df_score_pivot) +
 #panel.background = element_rect(fill = "gainsboro")
 ```
 
-* Figure Skating has very high internal motivation score! 
+In looking at this plot, there are many interesting things to note.
+
+We'll talk about maximum values per Assessment first:
+
+* Rugby has the highest average mental health score amongst all athletes and sports polled! After Rugby, Figure Skating, Equestrian, and Skiing are the next highest scorers respectively. 
+
+* Figure Skating has the highest score for internal motivation. However it is important to remember that Figure Skating had only one response, which is not a compelling amount of data for which we can say anything conclusive about the sport or the athletes within it. The second highest score for internal motivation is Gymnastics, closely followed by Skiing. Interestingly, these are all individual sports. Intuitively, this makes sense as people doing individual sports need to be heavily motivated in order to perform well in their respective sport. This is not to say team sport athletes are not motivated, however they could rely more on their teammates and thereby have more external motivation from the team, versus someone who is competing alone. 
+
+* Ping-Pong ranks as the most risk averse sport amongst athletes polled in this survey! The runners up were Rowing and Colorguard. 
+
+* Rowing has the highest success through hardwork score. In fact, all four of the categories are above average for Rowing. Gymnastics was second for success through hardwork, followed by Rugby. Based on the definition of the score, this would mean these three sports responded in the least ego-centric manner and attribute their success more to hardwork than pure talent and being "better" than their competitors. 
+
+Some indicators that deserve deeper conversation: 
+
+* Colorguard is the only sport that has a negative mental health score. Colorguard is a team of performers who perform choreographed dances and routines with various equipment to the music of the marching band show. Although the sports are quite different, there are some parallels to be made between Colorguard and Dance, however their scores are quite different upon comparison! Dance has a below average success through hardwork score, but above average on all other assessments, while colorguard is well below average on mental health and above average on others. One thing that makes colorguard different than all other sports on this list is the fact that the colorguard is performing alongside another performance, that being the marching band, perhaps that has some effect on participants that is not exhibited in other sports. 
+
+* Badminton and Weightlifting are the only two sports that skewed more towards the ego side of outlook on their success than on hardwork. This is surprising for weightlifting because weightlifting is almost not at all related to athletic ability or "being good" at it, since you need to build muscle overtime in order to become proficient, however perhaps something about the culture of weightlifting propegates this mentality. 
+
+* The amount of pro-risky behavior sports was surprising to us as well. Based on previous knowledge and research, we anticipated that football, rugby, boxing, wrestling, and ice hockey would be on the riskier side due to the violent aspects of their sport and sport cultures however cross country, golf, and badminton were very unexpected additions to this list. 
+
+Individual sports and Team sports don't show trends between groups indicating there may be no correlation between these factors and the type of sport, team or individual, you are part of. So we wondered if perhaps grouping by gender would be a better indicator for any of these assessments. We hand selected sports that had representation across both genders (in addition we also added Baseball and Softball as comparable sports for male and female respectively). 
+
+```{r}
+#look into male vs female breaks... 
+df_score_gender<- df_sports %>%
+  dplyr::select("CASEID", "PSPORT", "Mental Health Score", "Motivation Score", "Success Score", "Risk Behavior Score", "sport_group", "SEX") %>%
+  group_by(PSPORT, SEX) %>%
+  mutate(avg_mh = mean(`Mental Health Score`)) %>%
+  group_by(PSPORT, SEX) %>%
+  mutate(avg_motiv = mean(`Motivation Score`)) %>%
+  group_by(PSPORT, SEX) %>%
+  mutate(avg_success = mean(`Success Score`)) %>%
+  group_by(PSPORT, SEX) %>%
+  mutate(avg_risk = mean(`Risk Behavior Score`)) %>%
+  distinct(CASEID, PSPORT, SEX, .keep_all = TRUE) %>%
+  drop_na()
+
+df_score_pivot2 <- df_score_gender[,c(1:2, 8:12)] %>%
+  pivot_longer(!c(PSPORT, CASEID, SEX), names_to="Assessment", values_to="Score") %>%
+  group_by(PSPORT) %>%
+  mutate(Assessment = as.factor(Assessment)) %>%
+  mutate(Assessment = fct_recode(Assessment, 
+                                `Mental Health \n Score` = "avg_mh",
+                                `Motivated Internally` = "avg_motiv",
+                                `Risk Averse` = "avg_risk",
+                                `Success \n Through Hardwork` = "avg_success")) %>%
+  mutate(SEX = fct_recode(SEX, 
+                          Male = "(0) Male",
+                          Female = "(1) Female")) %>%
+  #filter(PSPORT!="NA", PSPORT !="Other") %>%
+  filter(PSPORT %in% c("Basketball", "Golf", "Boxing", "Rugby", "Soccer", "Swimming", "Track", "Lacrosse", "Volleyball", "Baseball", "Softball"))
+
+ggplot(data = df_score_pivot2) +
+  geom_col(aes(x = PSPORT, y = Score, fill = Assessment), color = "black", position="dodge", size = .25) +
+  facet_wrap(~SEX, scales="free_x") +
+  theme_classic(9) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Health & Life Outlook Scores for Select Sports by Gender") +
+  ylab("Average Score") +
+  xlab("Sport") +
+  scale_fill_brewer(palette="Blues") 
+
+```
+
+There is one assessment that clearly differs between men and women: risk tolerance! For all sports that have male and female participants, the males are more risk tolerant than the females are. This outcome is not incredibly surprising, however it is interesting to see that no female sport averages fell into the negative area. The closest were female rugby players. Based on the nature of rugby, this seems reasonable. 
+
+For some sports like soccer, females have a lower mental health score than males in their sport, however this is not consistent across all sports. When we compare baseketball we see that female baseketball players have a higher mental health score. So we cannot say that that one or the other gender has better or worse mental health outlooks. 
+
+We also see that male swimmers skew towards an ego-centered view on success. The next closest are female and male golfers. 
+
+
+```{r}
+library(ggalluvial)
+
+MH_responses2 <- as.data.frame(df) %>%
+  dplyr::select("CASEID", starts_with("CESD"), "PSPORT", "SEX") %>%
+  mutate(PSPORT = fct_recode(PSPORT,
+          `Badminton` = "(01) Badminton",                          
+          `Baseball` = "(02) Baseball",
+          `Basketball` = "(03) Basketball",
+          `Bowling` = "(04) Bowling",
+          `Boxing` = "(05) Boxing / Martial arts",
+          `Cheerleading` = "(06) Cheer / Spirit",
+          `Cross Country` = "(07) Cross country",
+          `Dance` = "(08) Dance team",
+          `Equestrian` = "(09) Equestrian",
+          `Field Hockey` = "(11) Field hockey",
+          `Figure Skating` = "(12) Figure skating",
+          `Football` = "(13) Football",
+          `Golf` = "(14) Golf",
+          `Gymnastics` = "(15) Gymnastics",
+          `Ice Hockey` = "(16) Ice hockey / Roller hockey",
+          `Lacrosse` = "(17) Lacrosse",
+          `Rugby` = "(18) Rugby",
+          `Skiing` = "(19) Skiing",
+          `Soccer` = "(20) Soccer",
+          `Softball` = "(21) Softball",
+          `Swimming` = "(22) Swimming / Diving",
+          `Tennis` = "(23) Tennis / Racquetball",
+          `Track` = "(24) Track and field",
+          `Volleyball` = "(25) Volleyball",
+          `Wrestling` = "(26) Wrestling",
+          `Snowboarding` = "(27) Snowboarding",
+          `Weightlifting` = "(28) Weightlifting",
+          `Handball` = "(29) Handball",
+          `Rowing` = "(30) Rowing / Crew",
+          `Cricket` = "(31) Cricket",
+          `Ping Pong` = "(32) Ping pong",
+          `Colorguard` = "(33) Color / Winterguard",
+          `Other` = "(66) Other sport")) %>%
+  mutate(sport_group = 
+           ifelse(PSPORT %in% individual_sport, 'Individual', 'Team')) %>%
+  rename("Bothered by things that \n usually don't bother me" = CESD01,
+        "Trouble keeping mind on \n what I was doing" = CESD02,
+        "Depressed" = CESD03,
+        "Everything was an effort" = CESD04,
+        "Hopeful about future" = CESD05,
+        "Fearful" = CESD06,
+        "Sleep was restless" = CESD07,
+        "Happy" = CESD08,
+        "Lonely" = CESD09,
+        "Could not get going" = CESD10) %>%
+  mutate(SEX = fct_recode(SEX, 
+                          Male = "(0) Male",
+                          Female = "(1) Female")) %>%
+  drop_na() 
+
+MH_pivot2 <- MH_responses2[,c(1:13)] %>%
+  pivot_longer(!c(CASEID, SEX, PSPORT), names_to="Assessment", values_to="Score") %>%
+  group_by(CASEID, SEX, PSPORT, Assessment, Score ) %>%
+  summarize(Freq = n()) %>%
+  ungroup() %>%
+  mutate(Score = fct_recode(Score, 
+                            Rarely = "(1) Rarely or none of the time (less than 1 day)", 
+                            Sometimes = "(2) Some or a little of the time (1-2 days)",
+                            Occasionally = "(3) Occasionally or a moderate amount of time (3-4 days)", 
+                            Always = "(4) All of the time (5-7 days)")) %>%
+  filter(PSPORT %in% c("Dance", "Track", "Golf", "Rugby", "Soccer", "Colorguard"))
+
+ggplot(MH_pivot2, aes(x = Assessment, stratum = Score, alluvium = CASEID,
+                          y = Freq, 
+                      fill = PSPORT, label = Score)) +
+  geom_flow() +
+  coord_flip() +
+  geom_stratum(alpha = 0.5) +
+  geom_text(stat = "stratum", size = 2) 
+  
+
+
+```
 
 
 ```{r}
@@ -679,8 +827,8 @@ g3 <- ggcorrplot(MH_ind_corr,
                  lab = TRUE)
 
 g1 + ggtitle('Correlation for All Athletes')
-g2 + ggtitle('Correlation for Team Athletes')
-g3 + ggtitle('Correlation for Individual Athletes')
+# g2 + ggtitle('Correlation for Team Athletes')
+# g3 + ggtitle('Correlation for Individual Athletes')
 ```
 
 ## Observations:
@@ -761,14 +909,25 @@ vcd::mosaic(CESD03 ~ TEOSQ13,
      main = "Dance: CESD03 vs. TEOSQ13")
 
 #Track vs. Dance responses to MH questions as pairs mosaic plot
-MH_responses[,c(2:12)] %>% 
-  filter(PSPORT == "Track" | PSPORT == "Dance") %>%
-  table() %>% pairs(space = .2,
-        lower_panel = pairs_mosaic(highlighting = 2, spacing = spacing_equal(0)),
-        upper_panel = pairs_mosaic(spacing = spacing_equal(0)),
-        diag_panel = pairs_barplot(
-          gp_vartext = gpar(fontsize = 8),
-          gp_leveltext = gpar(fontsize = 8),
-          abbreviate = 2))
+# MH_responses[,c(2:12)] %>% 
+#   filter(PSPORT == "Track" | PSPORT == "Dance") %>%
+#   table() %>% pairs(space = .2,
+#         lower_panel = pairs_mosaic(highlighting = 2, spacing = spacing_equal(0)),
+#         upper_panel = pairs_mosaic(spacing = spacing_equal(0)),
+#         diag_panel = pairs_barplot(
+#           gp_vartext = gpar(fontsize = 8),
+#           gp_leveltext = gpar(fontsize = 8),
+#           abbreviate = 2))
 
 ```
+
+
+
+```{r}
+#attempt alluvial diagram
+
+
+
+
+```
+
