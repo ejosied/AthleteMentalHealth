@@ -32,8 +32,5 @@ The result is a data set with 795 observations representing the student particip
 
 ## Issues/problems with the data:
 
-<<<<<<< HEAD
 * We did not encounter any issues with our data. 
-=======
-* We did not encounter any issues when working with this data.
->>>>>>> 9010e72ee9e5bfa6731c9d1bb727b1380c54bc39
+

@@ -20,7 +20,7 @@ How are view of success and mental health correlated?
 Example: How do mental health results correspond to the different responses to survey questions like “I am the best”?
 
 How do certain sports appear to be correlated with self-destructive/dangerous behaviors?
-Example: Is there a correlation between type of athelete and reports of behaviors like driving while drunk or high, or engaging in physical fights?
+Example: Is there a correlation between type of athlete and reports of behaviors like driving while drunk or high, or engaging in physical fights?
 
 ## How are individual/community connection to sports and mental health correlated?
 
