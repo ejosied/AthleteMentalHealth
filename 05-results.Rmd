@@ -933,7 +933,7 @@ ggplot(data = df_year_pivot %>%
 
 ```
 
-Surprising to us was the fact that Freshman and Senior distributions did not actually differ that much. We had assumed that perhaps over the course of college the differnce between Freshman and Senior for attributes like Success Through Hardwork or Internal Motivation may have increased. This plot is sorted by Motivation, however there doesn't seem to be clear distinction of upward progress between Freshman and Senior years. Important to note however is that these are not the same people in their Freshman and Senior years, but two different sets of people, so it could be that this group of Freshman is exceptionally mature and the Senior immature or simply that there is not as much of a measureable change visible in these years from this dataset. 
+Risk Aversion and Internal Motivation saw slight increases from Freshman to Senior. But surprising to us, Freshman and Senior distributions did not actually differ that much. We had assumed that perhaps over the course of college the difference between Freshman and Senior for attributes like Success Through Hardwork may have increased. This plot is sorted by Motivation, however there doesn't seem to be clear distinction of upward progress between Freshman and Senior years. Important to note however is that these are not the same people in their Freshman and Senior years, but two different sets of people, so it could be that this group of Freshman is exceptionally mature and the Senior immature or simply that there is not as much of a measureable change visible in these years from this dataset.
 
 ### Health & Life Outlook Scores by Race
 
@@ -987,5 +987,13 @@ ggplot(data = df_race_pivot) +
   scale_color_brewer(palette="Set2")
 ```
 
-An immediate finding is that the American Indian / Other respondents have multiple sports with significantly lower risk scores than their peers, meaning they are more risk tolerant and risk seeking.  
+An immediate finding is that the American Indian/Other respondents have multiple sports with significantly lower risk scores than their peers, meaning they are more risk tolerant and risk seeking.
+
+Dance has a noticebly low average mental health score among the Asian American population. Certain styles of dance, namely classical ballet, have a large Asian and Asian American presence worldwide, and dancers often report to have suffered in their mental health due to the physical and emotional demand of the sport. Perhaps this isolated low mental health score reflects this common complaint.
+
+The white respondents have the highest minimum mental health score of among the races. It also has one of the lowest maximum mental health scores, resulting in it being the race with the smallest range of scores for this assessment. This appears to be true for many the other assessments as well. This relative consistency may be a consequence of the race of the respondents, or perhaps it is a consequence of the fact that there around 500 of the 795 respondents were white, so these averages are more demonstrative of a larger population as opposed to being heavily influenced by individual responses.
+
+Generally, aside from the aforementioned observations, the races have comparable ranges and values among the different scores with no undeniable trend. There appears to be a very slight slope throughout all races that mirrors the ordering of sports (set in decreasing order of average mental health score among white respondents), but it is too subtle to draw conclusions about. Also, note that this ordering has a few sports out of order which can be seen in mental health dots (green) misplaced from the diagonal, but the desired effect is there.
+
+It would be interesting to take these plots a step further by including the mean values of scores among the sports, both within the faceted plots and among all observations. The inclusion of mean lines detracts from the readability of these static plots, but it may be insightful in an animated or interactive plot.
 
