@@ -255,7 +255,7 @@ df <- df %>% mutate(RACE = fct_recode(RACE,
                          `Asian American` = "(2) Asian American or Pacific Islander",
                          `Black / African American` = "(3) Black or African American",
                          `American Indian / Other` = "(6) American Indian / Native American / Other",
-                         `Mixed` = "(5) Mixed race"))
+                         `Mixed` = "(5) Mixed race")) 
 
 s1<- ggplot(df, aes(AGE)) +
   geom_bar(fill = "#6BAED6") +
@@ -272,7 +272,7 @@ s2<- ggplot(df, aes(fct_recode(SEX,
   ylab("") +
   theme_classic()
 
-s3<- ggplot(df, aes(fct_inorder(RACE))) +
+s3<- ggplot(df, aes(fct_infreq(RACE))) +
   geom_bar(fill = "#6BAED6") +
   xlab("Race") +
   ylab("") +
