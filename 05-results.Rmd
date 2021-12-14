@@ -735,7 +735,7 @@ There is one assessment that clearly differs between men and women: risk toleran
 
 For some sports like soccer, females have a lower mental health score than males in their sport, however this is not consistent across all sports. When we compare basketball we see that female basketball players have a higher mental health score. So we cannot say that that one or the other gender has better or worse mental health outlooks. 
 
-Because of the stark difference in male and females in sports like Rugby and Lacrosse we took a look at how they answered survey questions: 
+Because of the stark difference in male and females in sports like Rugby and Lacrosse we took a look at how they answered survey questions. Blue alluvium correspond to male respondents, and red alluvium correspond to female respondents.
 
 ```{r}
 Risk_responses <- as.data.frame(df) %>%
@@ -878,7 +878,14 @@ ggplot(data = (Risk_pivot %>% filter(PSPORT == "Lacrosse")), aes(x = Assessment,
 
 ```
 
+The questions are ordered from left to right in a general decreasing order of risk aversion; questions opposing risk and violence can be found on the left, more neutral questions can be found in the middle, and questions supporting risks and violence can be found on the right.
 
+In viewing the alluvial plot of responses of rugby players shows that many players answered questions similarly, particularly with questions that assess more extreme like or dislike of risk or violence. For example, There is little variation in the pattern of how the right-most four questions were answered. Also, observe the stark split in male (blue) and female (red) repsonses on the right side of the graph. There appears to be a 50-50 split in the gender of repondents who disagreed, but the only Rugby players in strong agreement were male, and the only players in strong disagreement were female. There is variation in the more neutral questions, and some of there is a general switch of yes and no answers among respondents at the left-most extreme; that is, some who answered "yes" to high-risk questions
+answered "no" to high-caution questions, and vise versa.
+
+The responses among lacross players were more individual; there are fewer sections where several players answered several questions similarly. Still, it can be seen that more male respondents agreed with the high-risk questions, and more female respondents disagreed; the converse appears to be true with high-caution questions.
+
+Note that these two sports have a similar number of respondents, making them good candidates for comparison.
 
 
 ### Health & Life Outlook Scores by College Year
