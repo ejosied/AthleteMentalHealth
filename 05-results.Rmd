@@ -272,7 +272,12 @@ s2<- ggplot(df, aes(fct_recode(SEX,
   ylab("") +
   theme_classic()
 
-s3<- ggplot(df, aes(fct_infreq(RACE))) +
+s3<- ggplot(df, aes(fct_infreq(fct_recode(RACE, 
+                         `White` = "(4) White or Caucasian",
+                         `Asian American` = "(2) Asian American or Pacific Islander",
+                         `Black / African American` = "(3) Black or African American",
+                         `American Indian / Other` = "(6) American Indian / Native American / Other",
+                         `Mixed` = "(5) Mixed race")))) +
   geom_bar(fill = "#6BAED6") +
   xlab("Race") +
   ylab("") +
