@@ -2,17 +2,18 @@
 
 ## What we learned
 
-We came into this project with an idea of how certain sports may be correlated with mental health outcomes. In our analyses, however, we found that these correlations are not as strong as we had thought. For example, we had expected that the critical nature of artistic sports like dance and gymnastics would result in more negative mental health responses among participants compares to goal-oriented sports like baseball or track, but the data shows that the type of sport did not have a strong connection to the mental health responses. In fact, the most noticeable difference in any calculated score was not found while faceting by sport, but by gender; the male athletes surveyed generally admitted to more risky behavior than the female athletes.
+We came into this project with an idea of how certain sports may be correlated with mental health outcomes. In our analysis, however, we found that these correlations are not as strong as we had thought. For example, we had expected that the critical nature of artistic or performative sports like dance and gymnastics would result in more negative mental health responses among participants compared to goal-oriented sports like baseball or soccer, but the data shows that the type of sport did not have a strong connection to the mental health responses. In fact, the most noticeable difference in any calculated score was not found while faceting by sport, but by gender; the male athletes surveyed generally admitted to more risky behavior than the female athletes.
 
-Rather than be disappointed that we did not find strong correlations between sports and mental health, we can instead take a moment to recognize how personal experiences and biases may lead us to make predictions that do not align with the facts.
+Rather than be disappointed that we did not find strong correlations between sports and mental health, we can instead take a moment to recognize how personal experiences and biases may lead us to make predictions that do not align with the facts. In addition, we also admit that not all athletes within a sport have the same mental health status, motivation for participation, risk tolerance, or perspectives on success - humans are diverse and faceted themselves! 
 
 
 ## Limitations
 
-The initial survey contained nearly six hundred responses from each participant, so there was a lot of information; we had to make some decisions to decide which information to include and excluding in hopes of best answering our questions. As a result, we may have omitted responses that could have led to interesting insights if we had only asked questions targetting those variables.
+The initial survey contained nearly six hundred responses from each participant, so there was a lot of information; we had to make some decisions to decide which information to include and exclude in hopes of best answering our questions. As a result, we may have omitted responses that could have led to interesting insights if we had only asked questions targeting those variables.
 
 We also made a decision to focus on only those respondents participating in a university sports at the time of the survey. Each participant was instructed to indicate all of the sports they participated in, at what level, and when; but to bring consistency to our population, we considered on the primary sport of each participant at the time the survey was completed. If we had a larger population of respondents, we could have expanded the conversation to subset the responses by college vs. community vs. high school sport, responses of athletes who played for several years as opposed to a single year, responses of athletes who play multiple sports as opposed to one, and more.
 
+Additionally, this dataset only represents college students, therefore this cannot be extrapolated to describe professional athletes, hobbyists, or amateur athletes outside of college. 
 
 ## Future directions
 
