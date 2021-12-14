@@ -1,6 +1,6 @@
 # Data transformation
 
-Our data is already in a form that is workable in R. The given data frame will be modified as needed to answer each of our questions.
+Our data is already in a form that is workable in R. The given data frame will be modified as needed to answer each of our questions. This can be seen in the code of our "Results" section.
 
 ```{r}
 
