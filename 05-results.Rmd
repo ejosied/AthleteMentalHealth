@@ -663,11 +663,15 @@ There is one assessment that clearly differs between men and women: risk toleran
 
 For some sports like soccer, females have a lower mental health score than males in their sport, however this is not consistent across all sports. When we compare basketball we see that female basketball players have a higher mental health score. So we cannot say that that one or the other gender has better or worse mental health outlooks. 
 
+<<<<<<< HEAD
 Male swimmers were the only ones who scored more towards the ego or pure talent perspective on athletic success. 
 
 Note about plot: We were unable to successfully sort by decreasing Risk Scores across both facets. Research online seemed to indicate this may be a wider issue with ggplot, facets, and factor ordering. Nonetheless, our intention was to sort by Risk Score in decreasing order. 
 
 Because of the stark difference in male and females in sports like Rugby and Lacrosse we took a look at how they answered survey questions: 
+=======
+Because of the stark difference in male and females in sports like Rugby and Lacrosse we took a look at how they answered survey questions. Blue alluvium correspond to male respondents, and red alluvium correspond to female respondents.
+>>>>>>> 9010e72ee9e5bfa6731c9d1bb727b1380c54bc39
 
 ```{r, out.width = 100%}
 Risk_responses <- as.data.frame(df) %>%
@@ -812,7 +816,16 @@ ggplot(data = (Risk_pivot %>% filter(PSPORT == "Lacrosse")), aes(x = Question, s
 
 The questions are ordered from left to right in a general decreasing order of risk aversion; questions opposing risk and violence can be found on the left, more neutral questions can be found in the middle, and questions supporting risks and violence can be found on the right.
 
+<<<<<<< HEAD
 In viewing the alluvial plot of responses of rugby players shows that many players answered questions similarly, particularly with questions that assess more extreme like or dislike of risk or violence. For example, There is little variation in the pattern of how the right-most four questions were answered. Also, observe the stark split in male (blue) and female (red) repsonses on the right side of the graph. There appears to be a 50-50 split in the gender of repondents who disagreed, but the only Rugby players in strong agreement were male, and the only players in strong disagreement were female. There is variation in the more neutral questions, and some of there is a general switch of yes and no answers among respondents at the left-most extreme; that is, some who answered "yes" to high-risk questions answered "no" to high-caution questions, and vise versa.
+=======
+In viewing the alluvial plot of responses of rugby players shows that many players answered questions similarly, particularly with questions that assess more extreme like or dislike of risk or violence. For example, There is little variation in the pattern of how the right-most four questions were answered. Also, observe the stark split in male (blue) and female (red) repsonses on the right side of the graph. There appears to be a 50-50 split in the gender of repondents who disagreed, but the only Rugby players in strong agreement were male, and the only players in strong disagreement were female. There is variation in the more neutral questions, and some of there is a general switch of yes and no answers among respondents at the left-most extreme; that is, some who answered "yes" to high-risk questions
+answered "no" to high-caution questions, and vise versa.
+
+The responses among lacross players were more individual; there are fewer sections where several players answered several questions similarly. Still, it can be seen that more male respondents agreed with the high-risk questions, and more female respondents disagreed; the converse appears to be true with high-caution questions.
+
+Note that these two sports have a similar number of respondents, making them good candidates for comparison.
+>>>>>>> 9010e72ee9e5bfa6731c9d1bb727b1380c54bc39
 
 The responses among lacrosse players were more individual; there are fewer sections where several players answered several questions similarly. Still, it can be seen that more male respondents agreed with the high-risk questions, and more female respondents disagreed; the converse appears to be true with high-caution questions.
 
@@ -870,9 +883,13 @@ ggplot(data = df_year_pivot %>%
 
 ```
 
+<<<<<<< HEAD
 Risk Aversion and Internal Motivation saw slight increases from Freshman to Senior. But surprising to us, Freshman and Senior distributions did not actually differ that much. We had assumed that perhaps over the course of college the difference between Freshman and Senior for attributes like Success Through Hardwork may have increased. This plot is sorted by Motivation (see Note), however there doesn't seem to be clear distinction of upward progress between Freshman and Senior years. Important to note however is that these are not the same people in their Freshman and Senior years, but two different sets of people, so it could be that this group of Freshman is exceptionally mature and the Senior immature or simply that there is not as much of a measureable change visible in these years from this dataset.
 
 Note about plot: We were unable to successfully sort by decreasing Motivation Scores across both facets. Research online seemed to indicate this may be a wider issue with ggplot, facets, and factor ordering. Nonetheless, our intention was to sort by Motivation Score in decreasing order. 
+=======
+Risk Aversion and Internal Motivation saw slight increases from Freshman to Senior. But surprising to us, Freshman and Senior distributions did not actually differ that much. We had assumed that perhaps over the course of college the difference between Freshman and Senior for attributes like Success Through Hardwork may have increased. This plot is sorted by Motivation, however there doesn't seem to be clear distinction of upward progress between Freshman and Senior years. Important to note however is that these are not the same people in their Freshman and Senior years, but two different sets of people, so it could be that this group of Freshman is exceptionally mature and the Senior immature or simply that there is not as much of a measureable change visible in these years from this dataset.
+>>>>>>> 9010e72ee9e5bfa6731c9d1bb727b1380c54bc39
 
 ### Health & Life Outlook Scores by Race
 

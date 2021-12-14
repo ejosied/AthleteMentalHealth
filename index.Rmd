@@ -9,15 +9,15 @@ site: bookdown::bookdown_site
 
 We were interested in analyzing the correlation between different sports and mental health outcomes. Our curiosity began with inquiries of how mental health varies within different catagories of sports: performative vs. competitive, team vs. individual, elite vs. amateur. correlated with mental health outcomes. It became our task to find data that spanned a variety of sports and offered several insights into mental health across a somewhat consistent population.
 
-In searching for datasets that had relevant information and data points, we found this 2006 survey data of 795 Northeastern students that targeted athletes and non-athletes. The data includes survey results on “how or if participation in sports affects their health-risk behavior”. Based on the data collected, we altered our questions and scope accordingly, and ultimately decided to fovcus on answering the following questions:
+In searching for datasets that had relevant information and data points, we found this 2006 survey data of 795 students from a university in the Northeastern United States that targeted athletes and non-athletes. The data includes survey results on “how or if participation in sports affects their health-risk behavior”. Based on the data collected, we altered our questions and scope accordingly, and ultimately decided to focus on answering the following questions:
 
 ## How are identification with sports and mental health correlated?
 
-How are perceived performance and mental health correlated?
-Example: How do mental health results correspond to the different responses to survey questions like “I am the best”?
-
 How are perceived ambition and mental health correlated?
 Example: How do mental health results correspond to the different responses to survey questions like “I do my very best”?
+
+How are view of success and mental health correlated?
+Example: How do mental health results correspond to the different responses to survey questions like “I am the best”?
 
 How do certain sports appear to be correlated with self-destructive/dangerous behaviors?
 Example: Is there a correlation between type of athelete and reports of behaviors like driving while drunk or high, or engaging in physical fights?

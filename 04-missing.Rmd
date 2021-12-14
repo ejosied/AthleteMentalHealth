@@ -21,6 +21,8 @@ names(df) <- abbreviate(names(df))
 
 ## Defining a Function to Plot Missing Value Patterns: miss_pat()
 
+This function allows us to determine which subsets of values are missing among different obervations in our data, organizing them by how commonly the missing pattern occurs.
+
 `miss_pat` takes in two values, 
 
 (1) `data`: the dataframe of interest and 
@@ -139,7 +141,7 @@ miss_pat <- function(data, style) {
 
 ## Visualizing Missing Patterns
 
-Since our dataset is quite large we only included missing patterns that had a count of at least 5. 
+Since our data set is so large with many combinations of variables that may be missing, we only considered missing patterns that occured at least five times throughout the observations. Also, note that the text in the top row indicates that that pattern corresponds to "complete cases" with no values missing.
 
 ```{r fig12}
 miss_pat(df, 'count')
@@ -148,11 +150,13 @@ miss_pat(df, 'percent')
 
 ### Observations 
 
-* The most common pattern is of complete cases, which is a great sign for our analysis! About 65% of rows contain no missing variables. 
+* The most common pattern is of complete cases; about 65% of rows contain no missing values. This is encouraging for our analysis. 
 
 * For patterns 2, 4, 5 & 7 - the pattern is fairly similar across and spans seemingly similar sets of variables. 
 
-* Patterns 3 & 6 are also similar in the types of missing data. 
+* Patterns 3 & 6 are also similar in the types of missing data.
+
+* The variable names are unreadable here, but the purpose of this plot is mainly to indicate where in our data set the missing values are commonly found; the next plots show which variables tend to be missing in more detail.
 
 ## A Deeper Look into the Missing Data 
 
