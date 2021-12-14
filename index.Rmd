@@ -13,9 +13,6 @@ In searching for datasets that had relevant information and data points, we foun
 
 ## How are identification with sports and mental health correlated?
 
-How does this change with different standards of measuring identity as an athlete?
-Example: How do students identifying as jock vs. athlete, or by response to the question “Sports are an important part of my life”?
-
 How are perceived performance and mental health correlated?
 Example: How do mental health results correspond to the different responses to survey questions like “I am the best”?
 
@@ -29,11 +26,7 @@ Example: Is there a correlation between type of athelete and reports of behavior
 
 How does the correlation differ between sports that are typically performed individually (example: golf, skiing), in small groups (example: tennis), or in larger teams (example: soccer)?
 
-How are responses to social survey questions like “Friends are involved in sports” and mental health survey questions like “Depressed if I couldn’t compete in sports” correlated?
-
 ## How are demographic information and mental health correlated for the student athletes?
-
-How does the correlation change in high school vs. college athletes? What about community athletes?
 
 How do mental health responses differ between male and female athletes? What about between sports that are traditionally male- or female-dominated? 
 
